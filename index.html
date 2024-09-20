@@ -49,11 +49,10 @@
         <h1>Match the Medical Terms</h1>
 
         <div class="term-container">
-            <!-- Terms for Prefixes -->
-            <div class="term-box" draggable="true" id="hypo">hypo-</div>
-            <div class="term-box" draggable="true" id="cardio">cardio</div>
-            <div class="term-box" draggable="true" id="itis">-itis</div>
-            <!-- Add more draggable terms here from the library -->
+            <!-- Terms for Prefixes, Roots, Suffixes -->
+            <div class="term-box" draggable="true" id="prefix">Prefix</div>
+            <div class="term-box" draggable="true" id="root">Root</div>
+            <div class="term-box" draggable="true" id="suffix">Suffix</div>
         </div>
 
         <div class="term-container">
@@ -73,11 +72,35 @@
         </div>
 
         <div id="hint"></div>
-
     </div>
 
     <script>
         let score = 0;
+        let currentTermIndex = 0;
+
+        const terms = [
+            {
+                prefix: "hypo-",
+                root: "cardio",
+                suffix: "-itis",
+                meaning: "Low blood sugar leading to inflammation of the heart.",
+                hint: "Low blood pressure combined with heart inflammation."
+            },
+            {
+                prefix: "hyper-",
+                root: "glyc",
+                suffix: "-emia",
+                meaning: "High blood sugar.",
+                hint: "Think about excessive sugar in the blood."
+            },
+            {
+                prefix: "brady-",
+                root: "cardio",
+                suffix: "-megaly",
+                meaning: "Slow heart rate with enlarged heart.",
+                hint: "Slow heart combined with enlargement."
+            }
+        ];
 
         const prefixZone = document.getElementById("prefix-zone");
         const rootZone = document.getElementById("root-zone");
@@ -86,21 +109,17 @@
         const hintBox = document.getElementById("hint");
         const scoreDisplay = document.getElementById("score");
 
-        // Term Library Example
-        const terms = {
-            hypo: {
-                prefix: "hypo-",
-                root: "cardio",
-                suffix: "-itis",
-                meaning: "Low blood sugar leading to inflammation of the heart.",
-                hint: "Low blood pressure combined with heart inflammation."
-            },
-            // Add more terms from your full term library here
-        };
+        const prefixElement = document.getElementById("prefix");
+        const rootElement = document.getElementById("root");
+        const suffixElement = document.getElementById("suffix");
 
-        const prefix = document.getElementById("hypo");
-        const root = document.getElementById("cardio");
-        const suffix = document.getElementById("itis");
+        // Initialize the first term
+        function loadTerm() {
+            const term = terms[currentTermIndex];
+            prefixElement.innerHTML = term.prefix;
+            rootElement.innerHTML = term.root;
+            suffixElement.innerHTML = term.suffix;
+        }
 
         // Add dragstart event
         document.querySelectorAll('.term-box').forEach(term => {
@@ -124,17 +143,30 @@
         });
 
         function checkMatch() {
-            if (prefixZone.innerHTML === "hypo-" && rootZone.innerHTML === "cardio" && suffixZone.innerHTML === "-itis") {
-                result.innerHTML = "Correct! " + terms.hypo.meaning;
+            const term = terms[currentTermIndex];
+            if (prefixZone.innerHTML === term.prefix && rootZone.innerHTML === term.root && suffixZone.innerHTML === term.suffix) {
+                result.innerHTML = "Correct! " + term.meaning;
                 score += 10;
                 scoreDisplay.innerHTML = score;
+                nextTerm();
             } else {
                 result.innerHTML = "Incorrect. Try again.";
             }
         }
 
+        function nextTerm() {
+            currentTermIndex++;
+            if (currentTermIndex < terms.length) {
+                resetGame();
+                loadTerm();
+            } else {
+                result.innerHTML = "Congratulations! You've completed all the terms!";
+            }
+        }
+
         function showHint() {
-            hintBox.innerHTML = terms.hypo.hint;
+            const term = terms[currentTermIndex];
+            hintBox.innerHTML = term.hint;
             hintBox.style.display = "block";
         }
 
@@ -146,6 +178,9 @@
             result.innerHTML = "";
             hintBox.style.display = "none";
         }
+
+        // Load the first term on page load
+        loadTerm();
     </script>
 </body>
 </html>
