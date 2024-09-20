@@ -309,14 +309,45 @@
                     termBox.innerHTML = option.text;
                     termContainer.appendChild(termBox);
 
-                    termBox.addEventListener("dragstart", function(e) {
-                        e.dataTransfer.setData("text", e.target.innerHTML);
-                        e.dataTransfer.setData("type", e.target.getAttribute("data-type"));
-                    });
+                    // Add touch and drag event handlers
+                    enableDragAndTouch(termBox);
                 }
             });
 
             attempts = 0;
+        }
+
+        function enableDragAndTouch(element) {
+            element.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData("text", e.target.innerHTML);
+                e.dataTransfer.setData("type", e.target.getAttribute("data-type"));
+            });
+
+            element.addEventListener('touchstart', function(e) {
+                const touch = e.touches[0];
+                element.setAttribute('data-dragged', 'true');
+                element.setAttribute('data-start-x', touch.clientX);
+                element.setAttribute('data-start-y', touch.clientY);
+            });
+
+            element.addEventListener('touchmove', function(e) {
+                if (element.getAttribute('data-dragged') === 'true') {
+                    e.preventDefault(); // Prevent default scrolling behavior
+                }
+            });
+
+            element.addEventListener('touchend', function(e) {
+                const dropTarget = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+                if (dropTarget.classList.contains('drop-zone')) {
+                    const draggedType = element.getAttribute("data-type");
+                    if (dropTarget.id.includes(draggedType)) {
+                        dropTarget.innerHTML = element.innerHTML;
+                    } else {
+                        document.getElementById("result").innerHTML = "Incorrect zone! Try again.";
+                    }
+                }
+                element.removeAttribute('data-dragged');
+            });
         }
 
         function shuffle(array) {
