@@ -78,28 +78,38 @@
         let score = 0;
         let currentTermIndex = 0;
 
+        // Full term library from what you provided (at least 30 terms included)
         const terms = [
-            {
-                prefix: "hypo-",
-                root: "cardio",
-                suffix: "-itis",
-                meaning: "Low blood sugar leading to inflammation of the heart.",
-                hint: "Low blood pressure combined with heart inflammation."
-            },
-            {
-                prefix: "hyper-",
-                root: "glyc",
-                suffix: "-emia",
-                meaning: "High blood sugar.",
-                hint: "Think about excessive sugar in the blood."
-            },
-            {
-                prefix: "brady-",
-                root: "cardio",
-                suffix: "-megaly",
-                meaning: "Slow heart rate with enlarged heart.",
-                hint: "Slow heart combined with enlargement."
-            }
+            { prefix: "a-", root: "sepsis", suffix: "", meaning: "Without infection.", hint: "Absence of infection." },
+            { prefix: "ante-", root: "partum", suffix: "", meaning: "Before labor.", hint: "Before the onset of labor." },
+            { prefix: "anti-", root: "septic", suffix: "", meaning: "Against infection.", hint: "Preventing infection." },
+            { prefix: "hypo-", root: "cardio", suffix: "-itis", meaning: "Low blood sugar leading to inflammation of the heart.", hint: "Low blood pressure combined with heart inflammation." },
+            { prefix: "hyper-", root: "glyc", suffix: "-emia", meaning: "High blood sugar.", hint: "Excessive sugar in the blood." },
+            { prefix: "brady-", root: "cardio", suffix: "-megaly", meaning: "Slow heart rate with an enlarged heart.", hint: "Slow heart with enlargement." },
+            { prefix: "peri-", root: "cardio", suffix: "-itis", meaning: "Inflammation around the heart.", hint: "Around the heart inflammation." },
+            { prefix: "tachy-", root: "pnea", suffix: "-ia", meaning: "Fast breathing.", hint: "Rapid breathing." },
+            { prefix: "dys-", root: "trophy", suffix: "-ia", meaning: "Abnormal growth or development.", hint: "Dysfunctional development." },
+            { prefix: "hemi-", root: "gastr", suffix: "-ectomy", meaning: "Surgical removal of half of the stomach.", hint: "Partial stomach removal." },
+            { prefix: "procto-", root: "itis", suffix: "", meaning: "Inflammation of the rectum.", hint: "Rectal inflammation." },
+            { prefix: "broncho-", root: "itis", suffix: "", meaning: "Inflammation of the bronchi.", hint: "Inflammation of the air passages." },
+            { prefix: "endo-", root: "scopy", suffix: "", meaning: "Visual examination within the body.", hint: "Internal visual examination." },
+            { prefix: "artery-", root: "ectomy", suffix: "", meaning: "Surgical removal of an artery.", hint: "Artery removal." },
+            { prefix: "chole-", root: "cystectomy", suffix: "", meaning: "Removal of the gallbladder.", hint: "Gallbladder removal." },
+            { prefix: "electro-", root: "cardiogram", suffix: "", meaning: "Recording of the heart's electrical activity.", hint: "Heart recording." },
+            { prefix: "laparo-", root: "scopy", suffix: "", meaning: "Examination of the abdominal cavity.", hint: "Abdominal examination." },
+            { prefix: "nephro-", root: "pathy", suffix: "", meaning: "Kidney disease.", hint: "Related to kidney disease." },
+            { prefix: "osteo-", root: "plasty", suffix: "", meaning: "Surgical repair of bones.", hint: "Bone surgery." },
+            { prefix: "rhino-", root: "plasty", suffix: "", meaning: "Surgical repair of the nose.", hint: "Nose surgery." },
+            { prefix: "thyroid-", root: "ectomy", suffix: "", meaning: "Removal of the thyroid gland.", hint: "Thyroid gland removal." },
+            { prefix: "cardio-", root: "megaly", suffix: "", meaning: "Enlargement of the heart.", hint: "Heart enlargement." },
+            { prefix: "gastro-", root: "enteritis", suffix: "", meaning: "Inflammation of the stomach and intestines.", hint: "Stomach and intestinal inflammation." },
+            { prefix: "neuro-", root: "pathy", suffix: "", meaning: "Disease of the nerves.", hint: "Nerve disease." },
+            { prefix: "arthro-", root: "plasty", suffix: "", meaning: "Surgical repair of a joint.", hint: "Joint repair surgery." },
+            { prefix: "colono-", root: "scopy", suffix: "", meaning: "Examination of the colon.", hint: "Colon examination." },
+            { prefix: "hepat-", root: "itis", suffix: "", meaning: "Inflammation of the liver.", hint: "Liver inflammation." },
+            { prefix: "nephro-", root: "ectomy", suffix: "", meaning: "Surgical removal of a kidney.", hint: "Kidney removal." },
+            { prefix: "myo-", root: "pathy", suffix: "", meaning: "Disease of muscle tissue.", hint: "Muscle tissue disease." },
+            { prefix: "dermo-", root: "pathy", suffix: "", meaning: "Disease of the skin.", hint: "Skin disease." }
         ];
 
         const prefixZone = document.getElementById("prefix-zone");
@@ -144,44 +154,5 @@
 
         function checkMatch() {
             const term = terms[currentTermIndex];
-            if (prefixZone.innerHTML === term.prefix && rootZone.innerHTML === term.root && suffixZone.innerHTML === term.suffix) {
-                result.innerHTML = "Correct! " + term.meaning;
-                score += 10;
-                scoreDisplay.innerHTML = score;
-                nextTerm();
-            } else {
-                result.innerHTML = "Incorrect. Try again.";
-            }
-        }
-
-        function nextTerm() {
-            currentTermIndex++;
-            if (currentTermIndex < terms.length) {
-                resetGame();
-                loadTerm();
-            } else {
-                result.innerHTML = "Congratulations! You've completed all the terms!";
-            }
-        }
-
-        function showHint() {
-            const term = terms[currentTermIndex];
-            hintBox.innerHTML = term.hint;
-            hintBox.style.display = "block";
-        }
-
-        function resetGame() {
-            // Reset drop zones
-            prefixZone.innerHTML = "Prefix";
-            rootZone.innerHTML = "Root";
-            suffixZone.innerHTML = "Suffix";
-            result.innerHTML = "";
-            hintBox.style.display = "none";
-        }
-
-        // Load the first term on page load
-        loadTerm();
-    </script>
-</body>
-</html>
+            if (prefixZone.innerHTML === term.prefix && rootZone.innerHTML ===
 
