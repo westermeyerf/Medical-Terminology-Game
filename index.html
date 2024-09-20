@@ -25,11 +25,11 @@
         .term-container {
             display: flex;
             justify-content: space-around;
-            flex-wrap: wrap; /* Ensure the terms wrap on smaller screens */
+            flex-wrap: wrap;
             margin-bottom: 20px;
         }
         .term-box, .drop-zone {
-            flex: 1 1 30%; /* Flexible width with minimum size */
+            flex: 1 1 30%;
             padding: 15px;
             margin: 5px;
             background-color: #444;
@@ -38,7 +38,7 @@
             transition: background-color 0.3s ease;
             cursor: pointer;
             color: #d3d3d3;
-            text-align: center; /* Ensure the text is centered */
+            text-align: center;
         }
         .drop-zone {
             background-color: #555;
@@ -116,17 +116,17 @@
         /* Mobile responsive adjustments */
         @media (max-width: 600px) {
             .term-box, .drop-zone {
-                flex: 1 1 45%; /* Adjust the size for mobile devices */
+                flex: 1 1 45%;
                 padding: 10px;
-                font-size: 0.9em; /* Slightly smaller text on mobile */
+                font-size: 0.9em;
             }
 
             h1 {
-                font-size: 1.5em; /* Reduce the header size on mobile */
+                font-size: 1.5em;
             }
 
             button {
-                font-size: 0.9em; /* Smaller buttons for mobile */
+                font-size: 0.9em;
             }
 
             #instruction, #result {
@@ -187,8 +187,8 @@
     <script>
         let score = 0;
         let currentTermIndex = 0;
-        let attempts = 0;  // To track the number of attempts
-        const maxOptions = 9;  // Limit number of options
+        let attempts = 0;
+        const maxOptions = 9;
 
         const terms = [
             { prefix: "hypo-", root: "glyc", suffix: "-emia", meaning: "Low blood sugar", hint: "Low sugar in the blood" },
@@ -265,7 +265,7 @@
         const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
 
         window.onload = function() {
-            shuffle(terms); // Shuffle the terms array before starting
+            shuffle(terms);
             loadTerm();
             displayLeaderboard();
         };
@@ -282,14 +282,13 @@
                 { type: "suffix", text: term.suffix }
             ];
 
-            // Select a few random false options to add to the display
             const selectedFalseOptions = {
                 prefix: selectRandomOptions(falseOptions.prefix, 3),
                 root: selectRandomOptions(falseOptions.root, 3),
                 suffix: selectRandomOptions(falseOptions.suffix, 3)
             };
 
-            const allOptions = [...components, 
+            const allOptions = [...components,
                 ...selectedFalseOptions.prefix.map(text => ({ type: "prefix", text })),
                 ...selectedFalseOptions.root.map(text => ({ type: "root", text })),
                 ...selectedFalseOptions.suffix.map(text => ({ type: "suffix", text }))
@@ -297,7 +296,6 @@
 
             shuffle(allOptions);
 
-            // Limit the number of displayed options to maxOptions
             const displayedOptions = allOptions.slice(0, maxOptions);
 
             termContainer.innerHTML = "";
@@ -343,7 +341,7 @@
                 e.preventDefault();
                 const draggedText = e.dataTransfer.getData("text");
                 const draggedType = e.dataTransfer.getData("type");
-                
+
                 if (e.target.id.includes(draggedType)) {
                     e.target.innerHTML = draggedText;
                 } else {
@@ -422,7 +420,7 @@
         function resetGame() {
             score = 0;
             currentTermIndex = 0;
-            shuffle(terms); // Shuffle the terms array each time the game is reset
+            shuffle(terms);
             document.getElementById("score").innerHTML = score;
             resetTerm();
             loadTerm();
