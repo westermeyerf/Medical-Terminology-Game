@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical Terminology Matching Game</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
         .term-container {
             display: flex;
             justify-content: space-between;
@@ -20,31 +27,76 @@
         .drop-zone {
             background-color: #f0f0f0;
             border: 1px dashed #333;
+            min-height: 50px;
+        }
+        .score {
+            margin-top: 20px;
+        }
+        #hint {
+            display: none;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        .buttons {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Match the Medical Terms</h1>
+    <div class="container">
+        <h1>Match the Medical Terms</h1>
 
-    <div class="term-container">
-        <div class="term-box" draggable="true" id="hypo">hypo-</div>
-        <div class="term-box" draggable="true" id="cardio">cardio</div>
-        <div class="term-box" draggable="true" id="itis">-itis</div>
+        <div class="term-container">
+            <!-- Terms for Prefixes -->
+            <div class="term-box" draggable="true" id="hypo">hypo-</div>
+            <div class="term-box" draggable="true" id="cardio">cardio</div>
+            <div class="term-box" draggable="true" id="itis">-itis</div>
+            <!-- Add more draggable terms here from the library -->
+        </div>
+
+        <div class="term-container">
+            <div class="drop-zone" id="prefix-zone">Prefix</div>
+            <div class="drop-zone" id="root-zone">Root</div>
+            <div class="drop-zone" id="suffix-zone">Suffix</div>
+        </div>
+
+        <div class="score">
+            <p id="result"></p>
+            <p>Score: <span id="score">0</span></p>
+        </div>
+
+        <div class="buttons">
+            <button onclick="showHint()">Show Hint</button>
+            <button onclick="resetGame()">Reset</button>
+        </div>
+
+        <div id="hint"></div>
+
     </div>
-
-    <div class="term-container">
-        <div class="drop-zone" id="prefix-zone">Prefix</div>
-        <div class="drop-zone" id="root-zone">Root</div>
-        <div class="drop-zone" id="suffix-zone">Suffix</div>
-    </div>
-
-    <p id="result"></p>
 
     <script>
+        let score = 0;
+
         const prefixZone = document.getElementById("prefix-zone");
         const rootZone = document.getElementById("root-zone");
         const suffixZone = document.getElementById("suffix-zone");
         const result = document.getElementById("result");
+        const hintBox = document.getElementById("hint");
+        const scoreDisplay = document.getElementById("score");
+
+        // Term Library Example
+        const terms = {
+            hypo: {
+                prefix: "hypo-",
+                root: "cardio",
+                suffix: "-itis",
+                meaning: "Low blood sugar leading to inflammation of the heart.",
+                hint: "Low blood pressure combined with heart inflammation."
+            },
+            // Add more terms from your full term library here
+        };
 
         const prefix = document.getElementById("hypo");
         const root = document.getElementById("cardio");
@@ -73,8 +125,26 @@
 
         function checkMatch() {
             if (prefixZone.innerHTML === "hypo-" && rootZone.innerHTML === "cardio" && suffixZone.innerHTML === "-itis") {
-                result.innerHTML = "Correct Match! Hypocarditis = Low blood pressure inflammation of the heart.";
+                result.innerHTML = "Correct! " + terms.hypo.meaning;
+                score += 10;
+                scoreDisplay.innerHTML = score;
+            } else {
+                result.innerHTML = "Incorrect. Try again.";
             }
+        }
+
+        function showHint() {
+            hintBox.innerHTML = terms.hypo.hint;
+            hintBox.style.display = "block";
+        }
+
+        function resetGame() {
+            // Reset drop zones
+            prefixZone.innerHTML = "Prefix";
+            rootZone.innerHTML = "Root";
+            suffixZone.innerHTML = "Suffix";
+            result.innerHTML = "";
+            hintBox.style.display = "none";
         }
     </script>
 </body>
