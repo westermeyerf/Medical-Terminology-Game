@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Terminology Matching Game</title>
+    <style>
+        .term-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .term-box, .drop-zone {
+            width: 100px;
+            padding: 10px;
+            border: 1px solid #000;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .drop-zone {
+            background-color: #f0f0f0;
+            border: 1px dashed #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Match the Medical Terms</h1>
+
+    <div class="term-container">
+        <div class="term-box" draggable="true" id="hypo">hypo-</div>
+        <div class="term-box" draggable="true" id="cardio">cardio</div>
+        <div class="term-box" draggable="true" id="itis">-itis</div>
+    </div>
+
+    <div class="term-container">
+        <div class="drop-zone" id="prefix-zone">Prefix</div>
+        <div class="drop-zone" id="root-zone">Root</div>
+        <div class="drop-zone" id="suffix-zone">Suffix</div>
+    </div>
+
+    <p id="result"></p>
+
+    <script>
+        const prefixZone = document.getElementById("prefix-zone");
+        const rootZone = document.getElementById("root-zone");
+        const suffixZone = document.getElementById("suffix-zone");
+        const result = document.getElementById("result");
+
+        const prefix = document.getElementById("hypo");
+        const root = document.getElementById("cardio");
+        const suffix = document.getElementById("itis");
+
+        // Add dragstart event
+        document.querySelectorAll('.term-box').forEach(term => {
+            term.addEventListener('dragstart', function (e) {
+                e.dataTransfer.setData("text", e.target.id);
+            });
+        });
+
+        // Add dragover and drop event
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.addEventListener('dragover', function (e) {
+                e.preventDefault();
+            });
+
+            zone.addEventListener('drop', function (e) {
+                e.preventDefault();
+                const data = e.dataTransfer.getData("text");
+                e.target.innerHTML = document.getElementById(data).innerHTML;
+                checkMatch();
+            });
+        });
+
+        function checkMatch() {
+            if (prefixZone.innerHTML === "hypo-" && rootZone.innerHTML === "cardio" && suffixZone.innerHTML === "-itis") {
+                result.innerHTML = "Correct Match! Hypocarditis = Low blood pressure inflammation of the heart.";
+            }
+        }
+    </script>
+</body>
+</html>
+
