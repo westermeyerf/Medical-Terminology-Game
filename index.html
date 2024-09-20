@@ -5,24 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical Terminology Matching Game</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .term-container { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .term-box, .drop-zone { width: 100px; padding: 10px; border: 1px solid #000; margin-right: 10px; cursor: pointer; }
-        .drop-zone { background-color: #f0f0f0; border: 1px dashed #333; min-height: 50px; }
-        .score { margin-top: 20px; }
-        #hint { display: none; background-color: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin-top: 10px; }
-        .buttons { margin-top: 20px; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        .term-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .term-box, .drop-zone {
+            width: 120px;
+            padding: 15px;
+            margin-right: 10px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        .drop-zone {
+            background-color: #f0f0f0;
+            border: 2px dashed #ccc;
+        }
+        .term-box:hover {
+            background-color: #bbdefb;
+        }
+        .score {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        #hint {
+            display: none;
+            background-color: #ffeb3b;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Match the Medical Terms</h1>
+        <h1>Medical Terminology Matching Game</h1>
 
-        <div class="term-container">
-            <div class="term-box" draggable="true" id="prefix">Prefix</div>
-            <div class="term-box" draggable="true" id="root">Root</div>
-            <div class="term-box" draggable="true" id="suffix">Suffix</div>
+        <div class="term-container" id="term-container">
+            <!-- Terms for Prefixes, Roots, Suffixes will be inserted dynamically -->
         </div>
 
         <div class="term-container">
@@ -32,53 +94,36 @@
         </div>
 
         <div class="score">
-            <p id="result"></p>
             <p>Score: <span id="score">0</span></p>
         </div>
 
+        <div id="result"></div>
+
         <div class="buttons">
             <button onclick="showHint()">Show Hint</button>
-            <button onclick="resetGame()">Reset</button>
+            <button onclick="resetGame()">Reset Game</button>
         </div>
 
         <div id="hint"></div>
     </div>
 
+    <!-- Add Sound Effects -->
+    <audio id="correct-sound" src="https://www.soundjay.com/button/sounds/button-29.mp3" preload="auto"></audio>
+    <audio id="incorrect-sound" src="https://www.soundjay.com/button/sounds/button-10.mp3" preload="auto"></audio>
+    <audio id="reset-sound" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
+
     <script>
         let score = 0;
         let currentTermIndex = 0;
 
+        const correctSound = document.getElementById("correct-sound");
+        const incorrectSound = document.getElementById("incorrect-sound");
+        const resetSound = document.getElementById("reset-sound");
+
         const terms = [
             { prefix: "a-", root: "sepsis", suffix: "", meaning: "Without infection.", hint: "Absence of infection." },
-            { prefix: "ante-", root: "partum", suffix: "", meaning: "Before labor.", hint: "Before the onset of labor." },
-            { prefix: "anti-", root: "septic", suffix: "", meaning: "Against infection.", hint: "Preventing infection." },
-            { prefix: "hypo-", root: "cardio", suffix: "-itis", meaning: "Low blood sugar leading to inflammation of the heart.", hint: "Low blood pressure combined with heart inflammation." },
-            { prefix: "hyper-", root: "glyc", suffix: "-emia", meaning: "High blood sugar.", hint: "Excessive sugar in the blood." },
-            { prefix: "brady-", root: "cardio", suffix: "-megaly", meaning: "Slow heart rate with an enlarged heart.", hint: "Slow heart with enlargement." },
-            { prefix: "peri-", root: "cardio", suffix: "-itis", meaning: "Inflammation around the heart.", hint: "Around the heart inflammation." },
-            { prefix: "tachy-", root: "pnea", suffix: "-ia", meaning: "Fast breathing.", hint: "Rapid breathing." },
-            { prefix: "dys-", root: "trophy", suffix: "-ia", meaning: "Abnormal growth or development.", hint: "Dysfunctional development." },
-            { prefix: "hemi-", root: "gastr", suffix: "-ectomy", meaning: "Surgical removal of half of the stomach.", hint: "Partial stomach removal." },
-            { prefix: "procto-", root: "itis", suffix: "", meaning: "Inflammation of the rectum.", hint: "Rectal inflammation." },
-            { prefix: "broncho-", root: "itis", suffix: "", meaning: "Inflammation of the bronchi.", hint: "Inflammation of the air passages." },
-            { prefix: "endo-", root: "scopy", suffix: "", meaning: "Visual examination within the body.", hint: "Internal visual examination." },
-            { prefix: "artery-", root: "ectomy", suffix: "", meaning: "Surgical removal of an artery.", hint: "Artery removal." },
-            { prefix: "chole-", root: "cystectomy", suffix: "", meaning: "Removal of the gallbladder.", hint: "Gallbladder removal." },
-            { prefix: "electro-", root: "cardiogram", suffix: "", meaning: "Recording of the heart's electrical activity.", hint: "Heart recording." },
-            { prefix: "laparo-", root: "scopy", suffix: "", meaning: "Examination of the abdominal cavity.", hint: "Abdominal examination." },
-            { prefix: "nephro-", root: "pathy", suffix: "", meaning: "Kidney disease.", hint: "Related to kidney disease." },
-            { prefix: "osteo-", root: "plasty", suffix: "", meaning: "Surgical repair of bones.", hint: "Bone surgery." },
-            { prefix: "rhino-", root: "plasty", suffix: "", meaning: "Surgical repair of the nose.", hint: "Nose surgery." },
-            { prefix: "thyroid-", root: "ectomy", suffix: "", meaning: "Removal of the thyroid gland.", hint: "Thyroid gland removal." },
-            { prefix: "cardio-", root: "megaly", suffix: "", meaning: "Enlargement of the heart.", hint: "Heart enlargement." },
-            { prefix: "gastro-", root: "enteritis", suffix: "", meaning: "Inflammation of the stomach and intestines.", hint: "Stomach and intestinal inflammation." },
-            { prefix: "neuro-", root: "pathy", suffix: "", meaning: "Disease of the nerves.", hint: "Nerve disease." },
-            { prefix: "arthro-", root: "plasty", suffix: "", meaning: "Surgical repair of a joint.", hint: "Joint repair surgery." },
-            { prefix: "colono-", root: "scopy", suffix: "", meaning: "Examination of the colon.", hint: "Colon examination." },
-            { prefix: "hepat-", root: "itis", suffix: "", meaning: "Inflammation of the liver.", hint: "Liver inflammation." },
-            { prefix: "nephro-", root: "ectomy", suffix: "", meaning: "Surgical removal of a kidney.", hint: "Kidney removal." },
-            { prefix: "myo-", root: "pathy", suffix: "", meaning: "Disease of muscle tissue.", hint: "Muscle tissue disease." },
-            { prefix: "dermo-", root: "pathy", suffix: "", meaning: "Disease of the skin.", hint: "Skin disease." }
+            { prefix: "ante-", root: "partum", suffix: "", meaning: "Before labor.", hint: "Before the onset of labor." }
+            // Add more terms here
         ];
 
         window.onload = function() {
@@ -87,17 +132,44 @@
 
         function loadTerm() {
             const term = terms[currentTermIndex];
-            document.getElementById("prefix").innerHTML = term.prefix;
-            document.getElementById("root").innerHTML = term.root;
-            document.getElementById("suffix").innerHTML = term.suffix;
+            let termContainer = document.getElementById("term-container");
+
+            // Create an array of term components
+            const components = [
+                { type: "prefix", text: term.prefix },
+                { type: "root", text: term.root },
+                { type: "suffix", text: term.suffix }
+            ];
+
+            // Shuffle the components array
+            shuffle(components);
+
+            // Clear the current term container
+            termContainer.innerHTML = "";
+
+            // Create term boxes dynamically and append them to the term container
+            components.forEach(component => {
+                let termBox = document.createElement("div");
+                termBox.classList.add("term-box");
+                termBox.setAttribute("draggable", "true");
+                termBox.setAttribute("id", component.type);
+                termBox.innerHTML = component.text;
+                termContainer.appendChild(termBox);
+
+                // Add dragstart event to each term box
+                termBox.addEventListener("dragstart", function(e) {
+                    e.dataTransfer.setData("text", e.target.id);
+                });
+            });
         }
 
-        // Add dragstart event to terms
-        document.querySelectorAll('.term-box').forEach(term => {
-            term.addEventListener('dragstart', function (e) {
-                e.dataTransfer.setData("text", e.target.id);
-            });
-        });
+        // Shuffle function to randomize the array
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
 
         // Add dragover and drop event for drop zones
         document.querySelectorAll('.drop-zone').forEach(zone => {
@@ -129,16 +201,18 @@
                 document.getElementById("result").innerHTML = "Correct! " + term.meaning;
                 score += 10;
                 document.getElementById("score").innerHTML = score;
+                correctSound.play(); // Play correct answer sound
                 setTimeout(nextTerm, 1000);  // Add a short delay before loading the next term
             } else {
                 document.getElementById("result").innerHTML = "Incorrect. Try again.";
+                incorrectSound.play(); // Play incorrect answer sound
             }
         }
 
         function nextTerm() {
             currentTermIndex++;
             if (currentTermIndex < terms.length) {
-                resetGame();
+                resetTerm();
                 loadTerm();
             } else {
                 document.getElementById("result").innerHTML = "Congratulations! You've completed all the terms!";
@@ -151,13 +225,23 @@
             document.getElementById("hint").style.display = "block";
         }
 
-        function resetGame() {
-            // Clear the drop zones
+        function resetTerm() {
+            // Clear the drop zones for the current term
             document.getElementById("prefix-zone").innerHTML = "Prefix";
             document.getElementById("root-zone").innerHTML = "Root";
             document.getElementById("suffix-zone").innerHTML = "Suffix";
             document.getElementById("result").innerHTML = "";
             document.getElementById("hint").style.display = "none";
+        }
+
+        function resetGame() {
+            // Reset the entire game: reset score, currentTermIndex, and game state
+            score = 0;
+            currentTermIndex = 0;
+            document.getElementById("score").innerHTML = score;
+            resetTerm();
+            loadTerm();
+            resetSound.play(); // Play reset sound
         }
     </script>
 </body>
