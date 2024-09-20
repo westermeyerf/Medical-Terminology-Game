@@ -5,43 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical Terminology Matching Game</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .term-container {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .term-box, .drop-zone {
-            width: 100px;
-            padding: 10px;
-            border: 1px solid #000;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        .drop-zone {
-            background-color: #f0f0f0;
-            border: 1px dashed #333;
-            min-height: 50px;
-        }
-        .score {
-            margin-top: 20px;
-        }
-        #hint {
-            display: none;
-            background-color: #f0f0f0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-        }
-        .buttons {
-            margin-top: 20px;
-        }
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .term-container { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .term-box, .drop-zone { width: 100px; padding: 10px; border: 1px solid #000; margin-right: 10px; cursor: pointer; }
+        .drop-zone { background-color: #f0f0f0; border: 1px dashed #333; min-height: 50px; }
+        .score { margin-top: 20px; }
+        #hint { display: none; background-color: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin-top: 10px; }
+        .buttons { margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -49,7 +20,6 @@
         <h1>Match the Medical Terms</h1>
 
         <div class="term-container">
-            <!-- Terms for Prefixes, Roots, Suffixes -->
             <div class="term-box" draggable="true" id="prefix">Prefix</div>
             <div class="term-box" draggable="true" id="root">Root</div>
             <div class="term-box" draggable="true" id="suffix">Suffix</div>
@@ -78,7 +48,6 @@
         let score = 0;
         let currentTermIndex = 0;
 
-        // Full term library from what you provided (at least 30 terms included)
         const terms = [
             { prefix: "a-", root: "sepsis", suffix: "", meaning: "Without infection.", hint: "Absence of infection." },
             { prefix: "ante-", root: "partum", suffix: "", meaning: "Before labor.", hint: "Before the onset of labor." },
@@ -112,33 +81,25 @@
             { prefix: "dermo-", root: "pathy", suffix: "", meaning: "Disease of the skin.", hint: "Skin disease." }
         ];
 
-        const prefixZone = document.getElementById("prefix-zone");
-        const rootZone = document.getElementById("root-zone");
-        const suffixZone = document.getElementById("suffix-zone");
-        const result = document.getElementById("result");
-        const hintBox = document.getElementById("hint");
-        const scoreDisplay = document.getElementById("score");
+        window.onload = function() {
+            loadTerm();
+        };
 
-        const prefixElement = document.getElementById("prefix");
-        const rootElement = document.getElementById("root");
-        const suffixElement = document.getElementById("suffix");
-
-        // Initialize the first term
         function loadTerm() {
             const term = terms[currentTermIndex];
-            prefixElement.innerHTML = term.prefix;
-            rootElement.innerHTML = term.root;
-            suffixElement.innerHTML = term.suffix;
+            document.getElementById("prefix").innerHTML = term.prefix;
+            document.getElementById("root").innerHTML = term.root;
+            document.getElementById("suffix").innerHTML = term.suffix;
         }
 
-        // Add dragstart event
+        // Add dragstart event to terms
         document.querySelectorAll('.term-box').forEach(term => {
             term.addEventListener('dragstart', function (e) {
                 e.dataTransfer.setData("text", e.target.id);
             });
         });
 
-        // Add dragover and drop event
+        // Add dragover and drop event for drop zones
         document.querySelectorAll('.drop-zone').forEach(zone => {
             zone.addEventListener('dragover', function (e) {
                 e.preventDefault();
@@ -147,12 +108,58 @@
             zone.addEventListener('drop', function (e) {
                 e.preventDefault();
                 const data = e.dataTransfer.getData("text");
-                e.target.innerHTML = document.getElementById(data).innerHTML;
-                checkMatch();
+                const draggedElement = document.getElementById(data);
+                e.target.innerHTML = draggedElement.innerHTML;
+                checkMatch(); // Call checkMatch after each drop
             });
         });
 
         function checkMatch() {
             const term = terms[currentTermIndex];
-            if (prefixZone.innerHTML === term.prefix && rootZone.innerHTML ===
+            const prefixZoneValue = document.getElementById("prefix-zone").innerHTML;
+            const rootZoneValue = document.getElementById("root-zone").innerHTML;
+            const suffixZoneValue = document.getElementById("suffix-zone").innerHTML;
+
+            // Check if all zones match the current term
+            if (
+                prefixZoneValue === term.prefix &&
+                rootZoneValue === term.root &&
+                suffixZoneValue === term.suffix
+            ) {
+                document.getElementById("result").innerHTML = "Correct! " + term.meaning;
+                score += 10;
+                document.getElementById("score").innerHTML = score;
+                setTimeout(nextTerm, 1000);  // Add a short delay before loading the next term
+            } else {
+                document.getElementById("result").innerHTML = "Incorrect. Try again.";
+            }
+        }
+
+        function nextTerm() {
+            currentTermIndex++;
+            if (currentTermIndex < terms.length) {
+                resetGame();
+                loadTerm();
+            } else {
+                document.getElementById("result").innerHTML = "Congratulations! You've completed all the terms!";
+            }
+        }
+
+        function showHint() {
+            const term = terms[currentTermIndex];
+            document.getElementById("hint").innerHTML = term.hint;
+            document.getElementById("hint").style.display = "block";
+        }
+
+        function resetGame() {
+            // Clear the drop zones
+            document.getElementById("prefix-zone").innerHTML = "Prefix";
+            document.getElementById("root-zone").innerHTML = "Root";
+            document.getElementById("suffix-zone").innerHTML = "Suffix";
+            document.getElementById("result").innerHTML = "";
+            document.getElementById("hint").style.display = "none";
+        }
+    </script>
+</body>
+</html>
 
