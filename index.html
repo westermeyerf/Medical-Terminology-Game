@@ -1,502 +1,83 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical Terminology Matching Game</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #1e1e1e;
-            color: #d3d3d3;
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #333;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        h1 {
-            color: #4CAF50;
-        }
-        .term-container {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #fff;
             display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
         }
-        .term-box, .drop-zone {
-            flex: 1 1 30%;
-            padding: 15px;
-            margin: 5px;
-            background-color: #444;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease;
-            cursor: pointer;
-            color: #d3d3d3;
+        #game-container {
+            padding: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            background-color: #333;
             text-align: center;
+        }
+        .options-container, .drop-zone-container {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .draggable {
+            margin: 5px;
+            padding: 5px;
+            background-color: #4CAF50;
+            cursor: pointer;
+            border-radius: 4px;
         }
         .drop-zone {
-            background-color: #555;
-            border: 2px dashed #888;
-        }
-        .term-box:hover {
-            background-color: #555;
-        }
-        .score {
-            margin-top: 20px;
-            font-size: 1.2em;
-        }
-        #result {
-            margin-top: 20px;
-            font-size: 1.2em;
-            color: #d3d3d3;
-        }
-        #hint {
-            display: none;
-            background-color: #666;
-            color: #f0f0f0;
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 5px;
-        }
-        #instruction {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            color: #d3d3d3;
-        }
-        .buttons {
-            margin-top: 20px;
-        }
-        button {
-            padding: 10px 20px;
             margin: 5px;
-            border: none;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 1em;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .leaderboard {
-            margin-top: 30px;
-            background-color: #222;
-            color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .leaderboard h2 {
-            margin-bottom: 15px;
-        }
-        .leaderboard ol {
-            padding-left: 20px;
-        }
-        .leaderboard li {
-            text-align: left;
-            display: flex;
-            align-items: center;
-        }
-        .medal {
-            margin-right: 10px;
-        }
-        .gold {
-            color: #ffd700;
-        }
-        .silver {
-            color: #c0c0c0;
-        }
-
-        /* Mobile responsive adjustments */
-        @media (max-width: 600px) {
-            .term-box, .drop-zone {
-                flex: 1 1 45%;
-                padding: 10px;
-                font-size: 0.9em;
-            }
-
-            h1 {
-                font-size: 1.5em;
-            }
-
-            button {
-                font-size: 0.9em;
-            }
-
-            #instruction, #result {
-                font-size: 1em;
-            }
-
-            .container {
-                padding: 10px;
-            }
+            padding: 10px;
+            border: 2px dashed #aaa;
+            width: 100px;
+            min-height: 30px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Medical Terminology Matching Game</h1>
+    <div id="game-container">
+        <h2>Medical Terminology Matching Game</h2>
+        <label>Enter your name: <input type="text" id="playerName"></label>
+        <h3 id="instruction">Identify the medical term for:</h3>
+        <div id="term-meaning">Loading...</div>
 
-        <!-- Player Name Input -->
-        <div>
-            <label for="playerName">Enter your name: </label>
-            <input type="text" id="playerName" placeholder="Your Name">
+        <div class="drop-zone-container">
+            <div id="prefix-zone" class="drop-zone" ondrop="drop(event, this)" ondragover="allowDrop(event)">Prefix</div>
+            <div id="root-zone" class="drop-zone" ondrop="drop(event, this)" ondragover="allowDrop(event)">Root</div>
+            <div id="suffix-zone" class="drop-zone" ondrop="drop(event, this)" ondragover="allowDrop(event)">Suffix</div>
         </div>
 
-        <div id="instruction"></div> <!-- Term instruction will go here -->
-
-        <div class="term-container" id="term-container">
-            <!-- Terms for Prefixes, Roots, Suffixes will be inserted dynamically -->
+        <div class="options-container">
+            <div id="prefix-options" class="options-list"></div>
+            <div id="root-options" class="options-list"></div>
+            <div id="suffix-options" class="options-list"></div>
         </div>
 
-        <div class="term-container">
-            <div class="drop-zone" id="prefix-zone">Prefix</div>
-            <div class="drop-zone" id="root-zone">Root</div>
-            <div class="drop-zone" id="suffix-zone">Suffix</div>
-        </div>
+        <button onclick="submitAttempt()">Submit Answer</button>
+        <p id="result">Result will be shown here</p>
+        <p>Score: <span id="score">0</span></p>
 
-        <div class="score">
-            <p>Score: <span id="score">0</span></p>
-        </div>
-
-        <div id="result"></div>
-
-        <div class="buttons">
-            <button onclick="submitAttempt()">Submit Answer</button>
-            <button onclick="showHint()">Show Hint</button>
-            <button onclick="resetGame()">Reset Game</button>
-        </div>
-
-        <div id="hint"></div>
+        <audio id="correct-sound" preload="auto">
+            <source src="correct.mp3" type="audio/mpeg">
+            <source src="correct.ogg" type="audio/ogg">
+        </audio>
+        <audio id="incorrect-sound" preload="auto">
+            <source src="incorrect.mp3" type="audio/mpeg">
+            <source src="incorrect.ogg" type="audio/ogg">
+        </audio>
     </div>
-
-    <!-- Leaderboard -->
-    <div class="leaderboard">
-        <h2>Top 10 Leaderboard</h2>
-        <ol id="leaderboard-list">
-            <!-- Leaderboard items will be dynamically inserted here -->
-        </ol>
-    </div>
-
-    <script>
-        let score = 0;
-        let currentTermIndex = 0;
-        let attempts = 0;
-        const maxOptions = 9;
-
-        const terms = [
-            { prefix: "hypo-", root: "glyc", suffix: "-emia", meaning: "Low blood sugar", hint: "Low sugar in the blood" },
-            { prefix: "hyper-", root: "tens", suffix: "-ion", meaning: "High blood pressure", hint: "Elevated blood pressure" },
-            { prefix: "brady-", root: "card", suffix: "-ia", meaning: "Slow heart rate", hint: "Slowed heart rate" },
-            { prefix: "tachy-", root: "card", suffix: "-ia", meaning: "Fast heart rate", hint: "Fast heartbeat" },
-            { prefix: "dys-", root: "uria", suffix: "", meaning: "Painful urination", hint: "Difficult or painful urination" },
-            { prefix: "peri-", root: "card", suffix: "-itis", meaning: "Inflammation around the heart", hint: "Inflammation of the membrane around the heart" },
-            { prefix: "sub-", root: "derm", suffix: "-al", meaning: "Beneath the skin", hint: "Underneath the skin" },
-            { prefix: "ante-", root: "partum", suffix: "", meaning: "Before childbirth", hint: "Before labor" },
-            { prefix: "poly-", root: "neur", suffix: "-itis", meaning: "Inflammation of many nerves", hint: "Inflammation affecting multiple nerves" },
-            { prefix: "hemi-", root: "arthro", suffix: "-plasty", meaning: "Surgical repair of half a joint", hint: "Partial joint replacement surgery" },
-            { prefix: "para-", root: "thyroid", suffix: "-ectomy", meaning: "Removal of the parathyroid glands", hint: "Surgical removal of parathyroid glands" },
-            { prefix: "gastro-", root: "enter", suffix: "-itis", meaning: "Inflammation of the stomach and intestines", hint: "Inflammation of the digestive system" },
-            { prefix: "neuro-", root: "path", suffix: "-y", meaning: "Disease of the nervous system", hint: "Disorder of the nerves" },
-            { prefix: "rhino-", root: "plasty", suffix: "", meaning: "Surgical repair of the nose", hint: "Nose surgery" },
-            { prefix: "osteo-", root: "arthr", suffix: "-itis", meaning: "Inflammation of bones and joints", hint: "Joint inflammation involving the bones" },
-            { prefix: "hypo-", root: "tension", suffix: "", meaning: "Low blood pressure", hint: "Decreased blood pressure" },
-            { prefix: "hyper-", root: "glycemia", suffix: "", meaning: "High blood sugar", hint: "Increased sugar in the blood" },
-            { prefix: "brady-", root: "cardia", suffix: "", meaning: "Slow heart rate", hint: "Slow heartbeat" },
-            { prefix: "tachy-", root: "pnea", suffix: "", meaning: "Fast breathing", hint: "Rapid breathing" },
-            { prefix: "dys-", root: "pepsia", suffix: "", meaning: "Indigestion", hint: "Difficult digestion" },
-            { prefix: "ante-", root: "natal", suffix: "", meaning: "Before birth", hint: "Before birth" },
-            { prefix: "sub-", root: "lingual", suffix: "", meaning: "Under the tongue", hint: "Beneath the tongue" },
-            { prefix: "poly-", root: "dipsia", suffix: "", meaning: "Excessive thirst", hint: "Abnormally great thirst" },
-            { prefix: "cardio-", root: "gram", suffix: "", meaning: "Record of heart activity", hint: "Heart monitoring record" },
-            { prefix: "neuro-", root: "logy", suffix: "", meaning: "Study of the nervous system", hint: "Study of nerves" },
-            { prefix: "gastro-", root: "scopy", suffix: "", meaning: "Viewing of the stomach", hint: "Visual examination of the stomach" },
-            { prefix: "rhino-", root: "scopy", suffix: "", meaning: "Viewing of the nasal cavity", hint: "Nasal examination" },
-            { prefix: "osteo-", root: "pathy", suffix: "", meaning: "Disease of the bones", hint: "Bone disease" },
-            { prefix: "arthro-", root: "plasty", suffix: "", meaning: "Surgical repair of a joint", hint: "Joint replacement surgery" },
-            { prefix: "nephr-", root: "ectomy", suffix: "", meaning: "Surgical removal of a kidney", hint: "Kidney removal surgery" },
-            { prefix: "cyst-", root: "itis", suffix: "", meaning: "Inflammation of the bladder", hint: "Bladder inflammation" },
-            { prefix: "my-", root: "itis", suffix: "", meaning: "Inflammation of muscles", hint: "Muscle inflammation" },
-            { prefix: "endo-", root: "crine", suffix: "-ology", meaning: "Study of endocrine glands", hint: "Study of hormone glands" },
-            { prefix: "bi-", root: "lateral", suffix: "", meaning: "Both sides", hint: "Relating to two sides" },
-            { prefix: "pre-", root: "operative", suffix: "", meaning: "Before surgery", hint: "Prior to surgery" },
-            { prefix: "post-", root: "operative", suffix: "", meaning: "After surgery", hint: "Following surgery" },
-            { prefix: "intra-", root: "venous", suffix: "", meaning: "Within a vein", hint: "Inside the veins" },
-            { prefix: "peri-", root: "operative", suffix: "", meaning: "Around the time of surgery", hint: "Before, during, or after surgery" },
-            { prefix: "extra-", root: "cellular", suffix: "", meaning: "Outside the cell", hint: "Outside of cells" },
-            { prefix: "retro-", root: "grade", suffix: "", meaning: "Moving backward", hint: "Reversing the normal flow" },
-            { prefix: "hyper-", root: "thermia", suffix: "", meaning: "High body temperature", hint: "Elevated body heat" },
-            { prefix: "hypo-", root: "thermia", suffix: "", meaning: "Low body temperature", hint: "Decreased body heat" },
-            { prefix: "hem-", root: "orrhage", suffix: "", meaning: "Severe bleeding", hint: "Excessive loss of blood" },
-            { prefix: "osteo-", root: "penia", suffix: "", meaning: "Decreased bone density", hint: "Low bone density" },
-            { prefix: "encephalo-", root: "pathy", suffix: "", meaning: "Brain disease", hint: "Disease of the brain" },
-            { prefix: "derma-", root: "titis", suffix: "", meaning: "Inflammation of the skin", hint: "Skin inflammation" },
-            { prefix: "hema-", root: "lysis", suffix: "", meaning: "Destruction of red blood cells", hint: "Red blood cell destruction" },
-            { prefix: "chole-", root: "lith", suffix: "-iasis", meaning: "Gallstones", hint: "Formation of stones in the gallbladder" },
-            { prefix: "arthro-", root: "scopy", suffix: "", meaning: "Viewing of a joint", hint: "Joint examination" },
-            { prefix: "thrombo-", root: "lysis", suffix: "", meaning: "Dissolution of a blood clot", hint: "Breaking down of a blood clot" },
-            { prefix: "angi-", root: "plasty", suffix: "", meaning: "Surgical repair of a blood vessel", hint: "Blood vessel surgery" },
-            { prefix: "cyto-", root: "logy", suffix: "", meaning: "Study of cells", hint: "Examination of cell structure" },
-            { prefix: "laryngo-", root: "scopy", suffix: "", meaning: "Examination of the larynx", hint: "Larynx examination" },
-            { prefix: "broncho-", root: "spasm", suffix: "", meaning: "Spasm of the airways", hint: "Sudden tightening of airway muscles" },
-            { prefix: "phlebo-", root: "tomy", suffix: "", meaning: "Incision into a vein", hint: "Vein surgery" },
-            { prefix: "myelo-", root: "pathy", suffix: "", meaning: "Disease of the spinal cord", hint: "Spinal cord disease" },
-            { prefix: "gluco-", root: "genesis", suffix: "", meaning: "Formation of glucose", hint: "Creation of glucose" },
-            { prefix: "hemo-", root: "globin", suffix: "", meaning: "Protein in red blood cells", hint: "Oxygen-carrying protein" },
-            { prefix: "leuko-", root: "cyte", suffix: "", meaning: "White blood cell", hint: "White blood cell type" },
-            { prefix: "uro-", root: "logy", suffix: "", meaning: "Study of the urinary system", hint: "Study of urinary organs" },
-            { prefix: "necro-", root: "sis", suffix: "", meaning: "Death of tissue", hint: "Tissue death" },
-            { prefix: "a-", root: "phasia", suffix: "", meaning: "Inability to speak", hint: "Loss of speech ability" },
-            { prefix: "bio-", root: "psy", suffix: "", meaning: "Removal of tissue for examination", hint: "Tissue sample for diagnosis" }
-        ];
-
-        const falseOptions = {
-            prefix: ["pre-", "hypo-", "peri-", "ante-", "poly-"],
-            root: ["algia", "cardio", "itis", "neur", "dipsia"],
-            suffix: ["-osis", "-ectomy", "-pathy", "-emia", "-plasty"]
-        };
-
-        const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
-
-        window.onload = function() {
-            shuffle(terms);
-            loadTerm();
-            displayLeaderboard();
-        };
-
-        function loadTerm() {
-            const term = terms[currentTermIndex];
-            let termContainer = document.getElementById("term-container");
-
-            document.getElementById("instruction").innerHTML = `Identify the medical term for: <strong>${term.meaning}</strong>`;
-
-            const components = [
-                { type: "prefix", text: term.prefix },
-                { type: "root", text: term.root },
-                { type: "suffix", text: term.suffix }
-            ];
-
-            const selectedFalseOptions = {
-                prefix: selectRandomOptions(falseOptions.prefix, 3),
-                root: selectRandomOptions(falseOptions.root, 3),
-                suffix: selectRandomOptions(falseOptions.suffix, 3)
-            };
-
-            const allOptions = [...components,
-                ...selectedFalseOptions.prefix.map(text => ({ type: "prefix", text })),
-                ...selectedFalseOptions.root.map(text => ({ type: "root", text })),
-                ...selectedFalseOptions.suffix.map(text => ({ type: "suffix", text }))
-            ];
-
-            shuffle(allOptions);
-
-            const displayedOptions = allOptions.slice(0, maxOptions);
-
-            termContainer.innerHTML = "";
-
-            displayedOptions.forEach(option => {
-                if (option.text) {
-                    let termBox = document.createElement("div");
-                    termBox.classList.add("term-box");
-                    termBox.setAttribute("draggable", "true");
-                    termBox.setAttribute("data-type", option.type);
-                    termBox.innerHTML = option.text;
-                    termContainer.appendChild(termBox);
-
-                    // Add touch and drag event handlers
-                    enableDragAndTouch(termBox);
-                }
-            });
-
-            attempts = 0;
-        }
-
-        function enableDragAndTouch(element) {
-            element.addEventListener('dragstart', function(e) {
-                e.dataTransfer.setData("text", e.target.innerHTML);
-                e.dataTransfer.setData("type", e.target.getAttribute("data-type"));
-            });
-
-            element.addEventListener('touchstart', function(e) {
-                const touch = e.touches[0];
-                element.setAttribute('data-dragged', 'true');
-                element.setAttribute('data-start-x', touch.clientX);
-                element.setAttribute('data-start-y', touch.clientY);
-            });
-
-            element.addEventListener('touchmove', function(e) {
-                if (element.getAttribute('data-dragged') === 'true') {
-                    e.preventDefault(); // Prevent default scrolling behavior
-                }
-            });
-
-            element.addEventListener('touchend', function(e) {
-                const dropTarget = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-                if (dropTarget.classList.contains('drop-zone')) {
-                    const draggedType = element.getAttribute("data-type");
-                    if (dropTarget.id.includes(draggedType)) {
-                        dropTarget.innerHTML = element.innerHTML;
-                    } else {
-                        document.getElementById("result").innerHTML = "Incorrect zone! Try again.";
-                    }
-                }
-                element.removeAttribute('data-dragged');
-            });
-        }
-
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-
-        function selectRandomOptions(array, count) {
-            const shuffled = array.slice();
-            shuffle(shuffled);
-            return shuffled.slice(0, count);
-        }
-
-        document.querySelectorAll('.drop-zone').forEach(zone => {
-            zone.addEventListener('dragover', function (e) {
-                e.preventDefault();
-            });
-
-            zone.addEventListener('drop', function (e) {
-                e.preventDefault();
-                const draggedText = e.dataTransfer.getData("text");
-                const draggedType = e.dataTransfer.getData("type");
-
-                if (e.target.id.includes(draggedType)) {
-                    e.target.innerHTML = draggedText;
-                } else {
-                    document.getElementById("result").innerHTML = "Incorrect zone! Try again.";
-                }
-            });
-        });
-
-        function submitAttempt() {
-            const term = terms[currentTermIndex];
-            const prefixZoneValue = document.getElementById("prefix-zone").innerHTML;
-            const rootZoneValue = document.getElementById("root-zone").innerHTML;
-            const suffixZoneValue = document.getElementById("suffix-zone").innerHTML;
-
-            if (
-                (prefixZoneValue === term.prefix || (term.prefix === "" && prefixZoneValue === "Prefix")) &&
-                (rootZoneValue === term.root || (term.root === "" && rootZoneValue === "Root")) &&
-                (suffixZoneValue === term.suffix || (term.suffix === "" && suffixZoneValue === "Suffix"))
-            ) {
-                document.getElementById("result").innerHTML = "Correct! " + term.meaning;
-                score += 10;
-                document.getElementById("score").innerHTML = score;
-                setTimeout(nextTerm, 1000);
-            } else {
-                attempts++;
-                if (attempts >= 2) {
-                    showHint();
-                } else {
-                    document.getElementById("result").innerHTML = "Incorrect. Try again.";
-                }
-            }
-        }
-
-        function showHint() {
-            const term = terms[currentTermIndex];
-            const prefixZoneValue = document.getElementById("prefix-zone").innerHTML;
-            const rootZoneValue = document.getElementById("root-zone").innerHTML;
-            const suffixZoneValue = document.getElementById("suffix-zone").innerHTML;
-
-            let hintMessage = "Hint: ";
-            if (prefixZoneValue !== term.prefix) {
-                hintMessage += `The correct prefix is "${term.prefix}". `;
-            }
-            if (rootZoneValue !== term.root) {
-                hintMessage += `The correct root is "${term.root}". `;
-            }
-            if (suffixZoneValue !== term.suffix) {
-                hintMessage += `The correct suffix is "${term.suffix}". `;
-            }
-
-            document.getElementById("hint").innerHTML = hintMessage;
-            document.getElementById("hint").style.display = "block";
-
-            setTimeout(nextTerm, 3000);
-        }
-
-        function nextTerm() {
-            currentTermIndex++;
-            if (currentTermIndex < terms.length) {
-                resetTerm();
-                loadTerm();
-            } else {
-                document.getElementById("result").innerHTML = "Congratulations! You've completed all the terms!";
-                checkLeaderboard();
-            }
-        }
-
-        function resetTerm() {
-            document.getElementById("prefix-zone").innerHTML = "Prefix";
-            document.getElementById("root-zone").innerHTML = "Root";
-            document.getElementById("suffix-zone").innerHTML = "Suffix";
-            document.getElementById("result").innerHTML = "";
-            document.getElementById("hint").style.display = "none";
-        }
-
-        function resetGame() {
-            score = 0;
-            currentTermIndex = 0;
-            shuffle(terms);
-            document.getElementById("score").innerHTML = score;
-            resetTerm();
-            loadTerm();
-        }
-
-        function checkLeaderboard() {
-            const playerName = document.getElementById("playerName").value || "Anonymous";
-            const newEntry = { name: playerName, score: score };
-
-            leaderboard.push(newEntry);
-            leaderboard.sort((a, b) => b.score - a.score);
-
-            if (leaderboard.length > 10) {
-                leaderboard.pop();
-            }
-
-            localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
-
-            displayLeaderboard();
-        }
-
-        function displayLeaderboard() {
-            const leaderboardList = document.getElementById("leaderboard-list");
-            leaderboardList.innerHTML = "";
-
-            leaderboard.forEach((entry, index) => {
-                const li = document.createElement("li");
-
-                if (index === 0) {
-                    const goldMedal = document.createElement("span");
-                    goldMedal.classList.add("medal", "gold");
-                    goldMedal.innerHTML = "🥇";
-                    li.appendChild(goldMedal);
-                } else if (index === 1) {
-                    const silverMedal = document.createElement("span");
-                    silverMedal.classList.add("medal", "silver");
-                    silverMedal.innerHTML = "🥈";
-                    li.appendChild(silverMedal);
-                }
-
-                li.appendChild(document.createTextNode(`${entry.name}: ${entry.score}`));
-                leaderboardList.appendChild(li);
-            });
-        }
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
-
