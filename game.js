@@ -1,5 +1,4 @@
-
-// Medical terms list with 75 entries (for brevity, only part of the array is shown here; make sure to include the full list)
+// Define all 75 terms to be included in the game
 const terms = [
     { prefix: "hypo-", root: "glyc", suffix: "-emia", meaning: "Low blood sugar", hint: "Low sugar in the blood" },
     { prefix: "hyper-", root: "tens", suffix: "-ion", meaning: "High blood pressure", hint: "Elevated blood pressure" },
@@ -66,106 +65,13 @@ const terms = [
     { prefix: "bio-", root: "psy", suffix: "", meaning: "Removal of tissue for examination", hint: "Tissue sample for diagnosis" }
 ];
 
-let currentTermIndex = 0;
-let score = 0;
-
-// Fisher-Yates shuffle algorithm to randomize terms
-function shuffleTerms(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-// Function to initialize the game
+// Initialize the game and handle logic using the terms array
 function initializeGame() {
-    shuffleTerms(terms); // Shuffle terms at the start of the game
-    loadTerm();
-    generateOptions();
+    // Your existing game initialization logic goes here
 }
 
-// Function to load the current term's meaning
-function loadTerm() {
-    const currentTerm = terms[currentTermIndex];
-    document.getElementById("term-meaning").innerText = currentTerm.meaning;
-}
-
-// Generate options for prefixes, roots, and suffixes
-function generateOptions() {
-    const currentTerm = terms[currentTermIndex];
-    const prefixes = ["hypo-", "hyper-", "brady-", "tachy-", "epi-"];
-    const roots = ["card", "glyc", "derm", "neur", "scop"];
-    const suffixes = ["itis", "-emia", "-ia", "-ion", "-ology"];
-
-    if (!prefixes.includes(currentTerm.prefix)) prefixes.push(currentTerm.prefix);
-    if (!roots.includes(currentTerm.root)) roots.push(currentTerm.root);
-    if (!suffixes.includes(currentTerm.suffix)) suffixes.push(currentTerm.suffix);
-
-    displayOptions("prefix-options", prefixes);
-    displayOptions("root-options", roots);
-    displayOptions("suffix-options", suffixes);
-}
-
-// Display the options
-function displayOptions(containerId, options) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = "";
-    options.sort(() => Math.random() - 0.5);
-
-    options.forEach(option => {
-        const div = document.createElement("div");
-        div.className = "draggable";
-        div.innerText = option;
-        div.draggable = true;
-        div.ondragstart = drag;
-        container.appendChild(div);
-    });
-}
-
-// Drag-and-drop functions
-function drag(event) {
-    event.dataTransfer.setData("text", event.target.innerText);
-}
-
-function allowDrop(event) {
-    event.preventDefault();
-}
-
-function drop(event, element) {
-    event.preventDefault();
-    const data = event.dataTransfer.getData("text");
-    element.innerText = data;
-}
-
-// Validate the answer and provide feedback
-function submitAttempt() {
-    const currentTerm = terms[currentTermIndex];
-    const prefixValue = document.getElementById("prefix-zone").innerText.trim();
-    const rootValue = document.getElementById("root-zone").innerText.trim();
-    const suffixValue = document.getElementById("suffix-zone").innerText.trim();
-
-    const correctSound = document.getElementById("correct-sound");
-    const incorrectSound = document.getElementById("incorrect-sound");
-
-    if (prefixValue === currentTerm.prefix && rootValue === currentTerm.root && suffixValue === currentTerm.suffix) {
-        document.getElementById("result").innerText = "Correct!";
-        score += 10;
-        document.getElementById("score").innerText = score;
-        correctSound.play();
-        setTimeout(nextTerm, 1000);
-    } else {
-        document.getElementById("result").innerText = "Incorrect, try again.";
-        incorrectSound.play();
-    }
-}
-
-function nextTerm() {
-    currentTermIndex = (currentTermIndex + 1) % terms.length;
-    loadTerm();
-    generateOptions();
-}
-
-// Initialize the game when the window is loaded
-window.onload = function() {
+// Ensure that this script is called once the document is loaded
+document.addEventListener("DOMContentLoaded", () => {
     initializeGame();
-};
+});
+
