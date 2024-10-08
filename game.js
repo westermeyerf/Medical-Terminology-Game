@@ -160,7 +160,7 @@ function resetTimer() {
 function checkGameEnd() {
     if (incorrectAnswers >= 5) { // If player has 5 incorrect answers
         document.getElementById("result").innerText = "Game over!"; // Show game over message
-        showReview(); // Show the end-of-level review
+        showReview(true); // Show the review immediately and indicate game over
     } else {
         nextTerm(); // Otherwise, proceed to the next term
     }
@@ -194,7 +194,7 @@ function submitAttempt() {
         updateProgressBar();
 
         if (correctAnswers % termsPerLevel === 0) {
-            showReview();
+            showReview(false); // Show end-of-level review
         } else {
             nextTerm();
         }
@@ -224,7 +224,7 @@ function useHint() {
 }
 
 // Review display
-function showReview() {
+function showReview(isGameOver) {
     document.getElementById("review-container").classList.remove("hidden");
     document.getElementById("game-container").classList.add("hidden");
     const reviewList = document.getElementById("review-list");
@@ -235,6 +235,11 @@ function showReview() {
         div.innerText = `${item.term}: ${item.result}`;
         reviewList.appendChild(div);
     });
+    if (!isGameOver) {
+        document.getElementById("result").innerText = "Level Complete! Review your terms.";
+    } else {
+        document.getElementById("result").innerText = "Game Over! Review your terms.";
+    }
 }
 
 // Next level
@@ -286,3 +291,4 @@ function drop(event, element) {
 window.onload = function() {
     initializeGame();
 };
+
