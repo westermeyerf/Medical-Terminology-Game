@@ -1,9 +1,3 @@
-/// Sample leaderboard data
-let leaderboard = [
-    { name: "Alice", score: 150 },
-    { name: "Bob", score: 130 },
-    { name: "Charlie", score: 110 }
-];
 
 const terms = [
     { prefix: "hypo-", root: "glyc", suffix: "-emia", meaning: "Low blood sugar", hint: "Low sugar in the blood" },
@@ -82,25 +76,6 @@ let timerInterval;
 const termsPerLevel = 10;
 const totalTermsToWin = 70;
 let currentTermReview = [];
-
-// Display the leaderboard
-function displayLeaderboard() {
-    const leaderboardList = document.getElementById("leaderboard-list");
-    leaderboardList.innerHTML = ""; // Clear previous entries
-
-    leaderboard.forEach((entry, index) => {
-        const li = document.createElement("li");
-        li.innerText = `${index + 1}. ${entry.name} - ${entry.score} points`;
-        leaderboardList.appendChild(li);
-    });
-}
-
-// Show Game Page and initialize the game
-function showGamePage() {
-    document.getElementById("start-page").classList.add("hidden");
-    document.getElementById("game-page").classList.remove("hidden");
-    initializeGame();
-}
 
 // Initialize the game
 function initializeGame() {
@@ -181,7 +156,6 @@ function resetTimer() {
 function checkGameEnd() {
     if (incorrectAnswers >= 5) {
         document.getElementById("result").innerText = "Game over!";
-        updateLeaderboard();
         showReview();
     } else {
         nextTerm();
@@ -276,16 +250,8 @@ function drop(event, element) {
     element.innerText = data;
 }
 
-// Update leaderboard with the current score
-function updateLeaderboard() {
-    const playerName = document.getElementById("playerName").value || "Player";
-    leaderboard.push({ name: playerName, score: score });
-    leaderboard.sort((a, b) => b.score - a.score);
-    leaderboard = leaderboard.slice(0, 10);  // Keep top 10 scores only
-    displayLeaderboard();
-}
-
-// Initialize the game on page load and show the leaderboard
+// Initialize the game on page load
 window.onload = function() {
-    displayLeaderboard();
+    initializeGame();
 };
+
