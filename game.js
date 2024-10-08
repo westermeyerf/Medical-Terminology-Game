@@ -63,7 +63,6 @@ const terms = [
     { prefix: "necro-", root: "sis", suffix: "", meaning: "Death of tissue", hint: "Tissue death" },
     { prefix: "a-", root: "phasia", suffix: "", meaning: "Inability to speak", hint: "Loss of speech ability" },
     { prefix: "bio-", root: "psy", suffix: "", meaning: "Removal of tissue for examination", hint: "Tissue sample for diagnosis" }
-
 ];
 
 let currentTermIndex = 0;
@@ -71,20 +70,10 @@ let score = 0;
 let level = 1;
 let correctAnswers = 0;
 let incorrectAnswers = 0;
-let correctStreak = 0;
-let timerInterval;
 const termsPerLevel = 10;
 const totalTermsToWin = 70;
-let currentTermReview = [];
 
-// Initialize the game
-function initializeGame() {
-    shuffleTerms(terms);
-    loadTerm();
-    generateOptions();
-    startTimer();
-    updateProgressBar();
-}
+let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
 
 // Shuffle function
 function shuffleTerms(array) {
@@ -94,19 +83,30 @@ function shuffleTerms(array) {
     }
 }
 
+// Initialize the game
+function initializeGame() {
+    shuffleTerms(terms);
+    loadTerm();
+    generateOptions();
+}
+
 // Load the current term
 function loadTerm() {
     const currentTerm = terms[currentTermIndex];
     document.getElementById("term-meaning").innerText = currentTerm.meaning;
-    document.getElementById("result").innerText = '';
 }
 
-// Generate options
+// Generate options for prefixes, roots, and suffixes
 function generateOptions() {
     const currentTerm = terms[currentTermIndex];
-    const prefixes = ["hypo-", "hyper-", "brady-", "tachy-", "epi-", currentTerm.prefix];
-    const roots = ["card", "glyc", "derm", "neur", "scop", currentTerm.root];
-    const suffixes = ["itis", "-emia", "-ia", "-ion", "-ology", currentTerm.suffix];
+    const prefixes = ["hypo-", "hyper-", "brady-", "tachy-", "epi-"];
+    const roots = ["card", "glyc", "derm", "neur", "scop"];
+    const suffixes = ["itis", "-emia", "-ia", "-ion", "-ology"];
+
+    prefixes.push(currentTerm.prefix);
+    roots.push(currentTerm.root);
+    suffixes.push(currentTerm.suffix);
+
     displayOptions("prefix-options", prefixes);
     displayOptions("root-options", roots);
     displayOptions("suffix-options", suffixes);
@@ -117,6 +117,7 @@ function displayOptions(containerId, options) {
     const container = document.getElementById(containerId);
     container.innerHTML = "";
     options.sort(() => Math.random() - 0.5);
+
     options.forEach(option => {
         const div = document.createElement("div");
         div.className = "draggable";
@@ -125,114 +126,6 @@ function displayOptions(containerId, options) {
         div.ondragstart = drag;
         container.appendChild(div);
     });
-}
-
-// Timer function
-function startTimer() {
-    let timeRemaining = 15;
-    document.getElementById("timer").innerText = timeRemaining;
-    
-    timerInterval = setInterval(() => {
-        timeRemaining--;
-        document.getElementById("timer").innerText = timeRemaining;
-        
-        if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            incorrectAnswers++;
-            document.getElementById("result").innerText = "Time's up!";
-            currentTermReview.push({ term: terms[currentTermIndex].meaning, result: "Time ran out" });
-            checkGameEnd();
-        }
-    }, 1000);
-}
-
-// Reset timer
-function resetTimer() {
-    clearInterval(timerInterval);
-    startTimer();
-}
-
-// Check for game end or proceed to the next term
-function checkGameEnd() {
-    if (incorrectAnswers >= 5) {
-        document.getElementById("result").innerText = "Game over!";
-        showReview();
-    } else {
-        nextTerm();
-    }
-}
-
-// Move to the next term
-function nextTerm() {
-    resetTimer();
-    currentTermIndex = (currentTermIndex + 1) % terms.length;
-    loadTerm();
-    generateOptions();
-}
-
-// Submit attempt
-function submitAttempt() {
-    const currentTerm = terms[currentTermIndex];
-    const prefixValue = document.getElementById("prefix-zone").innerText.trim();
-    const rootValue = document.getElementById("root-zone").innerText.trim();
-    const suffixValue = document.getElementById("suffix-zone").innerText.trim();
-    const correctSound = document.getElementById("correct-sound");
-    const incorrectSound = document.getElementById("incorrect-sound");
-
-    if (prefixValue === currentTerm.prefix && rootValue === currentTerm.root && suffixValue === currentTerm.suffix) {
-        correctAnswers++;
-        score += 10;
-        correctStreak++;
-        if (correctStreak % 3 === 0) score += 5;
-        document.getElementById("score").innerText = score;
-        correctSound.play();
-        currentTermReview.push({ term: currentTerm.meaning, result: "Correct" });
-        updateProgressBar();
-
-        if (correctAnswers >= totalTermsToWin) {
-            showReview();
-        } else {
-            nextTerm();
-        }
-    } else {
-        incorrectAnswers++;
-        correctStreak = 0;
-        incorrectSound.play();
-        document.getElementById("result").innerText = "Incorrect, try again.";
-        currentTermReview.push({ term: currentTerm.meaning, result: "Incorrect" });
-        checkGameEnd();
-    }
-    resetTimer();
-}
-
-// Progress bar update
-function updateProgressBar() {
-    const progress = (correctAnswers % termsPerLevel) / termsPerLevel * 100;
-    document.getElementById("progress-bar").style.width = progress + "%";
-}
-
-// Hint function
-function useHint() {
-    const currentTerm = terms[currentTermIndex];
-    alert(`Hint: ${currentTerm.hint}`);
-    score = Math.max(0, score - 5);
-    document.getElementById("score").innerText = score;
-}
-
-// Review display for game end
-function showReview() {
-    document.getElementById("game-page").classList.add("hidden");
-    const reviewList = document.createElement("div");
-    reviewList.innerHTML = "<h3>Game Over! Here are your results:</h3>";
-    
-    currentTermReview.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "review-item";
-        div.innerText = `${item.term}: ${item.result}`;
-        reviewList.appendChild(div);
-    });
-
-    document.body.appendChild(reviewList);
 }
 
 // Drag and drop functions
@@ -250,8 +143,124 @@ function drop(event, element) {
     element.innerText = data;
 }
 
-// Initialize the game on page load
+// Submit answer
+function submitAttempt() {
+    const currentTerm = terms[currentTermIndex];
+    const prefixValue = document.getElementById("prefix-zone").innerText.trim();
+    const rootValue = document.getElementById("root-zone").innerText.trim();
+    const suffixValue = document.getElementById("suffix-zone").innerText.trim();
+
+    const correctSound = document.getElementById("correct-sound");
+    const incorrectSound = document.getElementById("incorrect-sound");
+
+    if (prefixValue === currentTerm.prefix && rootValue === currentTerm.root && suffixValue === currentTerm.suffix) {
+        correctAnswers++;
+        score += 10;
+        document.getElementById("score").innerText = score;
+        correctSound.play();
+        
+        if (correctAnswers === totalTermsToWin) {
+            updateLeaderboard();
+            return;
+        }
+
+        if (correctAnswers % termsPerLevel === 0) {
+            level++;
+            document.getElementById("level").innerText = level;
+        }
+        
+        setTimeout(nextTerm, 1000);
+    } else {
+        incorrectAnswers++;
+        document.getElementById("result").innerText = "Incorrect, try again.";
+        incorrectSound.play();
+        
+        if (incorrectAnswers >= 5) {
+            updateLeaderboard();
+            resetGame();
+        }
+    }
+}
+
+// Move to next term
+function nextTerm() {
+    currentTermIndex = (currentTermIndex + 1) % terms.length;
+    loadTerm();
+    generateOptions();
+}
+
+// Reset the game
+function resetGame() {
+    currentTermIndex = 0;
+    score = 0;
+    level = 1;
+    correctAnswers = 0;
+    incorrectAnswers = 0;
+    document.getElementById("score").innerText = score;
+    document.getElementById("level").innerText = level;
+    initializeGame();
+}
+
+// Update leaderboard
+function updateLeaderboard() {
+    const playerName = document.getElementById("playerName").value || "Player";
+    leaderboard.push({ name: playerName, score });
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, 10); // Keep only top 10
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+
+    showLeaderboard();
+}
+
+// Display leaderboard
+function showLeaderboard() {
+    const container = document.getElementById("leaderboard-container");
+    const list = document.getElementById("leaderboard");
+    list.innerHTML = '';
+    
+    leaderboard.forEach((entry, index) => {
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `${index + 1}. ${entry.name} - ${entry.score} ${getMedal(index)}`;
+        list.appendChild(listItem);
+    });
+    
+    container.style.display = "block";
+}
+
+// Medal icons
+function getMedal(index) {
+    if (index === 0) return '🥇';
+    if (index === 1) return '🥈';
+    if (index === 2) return '🥉';
+    return '';
+}
+
+// Initialize the game when the window is loaded
 window.onload = function() {
     initializeGame();
 };
+
+
+
+
+// Function to advance to the next level
+function advanceLevel() {
+    level += 1;  // Increment the level
+    correctAnswers = 0;  // Reset correct answers count for new level
+    document.getElementById('level-number').innerText = `Level ${level}`;  // Update level display
+    document.getElementById('progress-bar').value = 0;  // Reset the progress bar
+}
+
+
+// Update progress based on correct answers
+function updateProgress(increment) {
+    correctAnswers += increment;
+    let progressBar = document.getElementById('progress-bar');
+    progressBar.value = (correctAnswers / termsPerLevel) * 100;
+
+    // Check if the progress bar is full, then advance level
+    if (correctAnswers >= termsPerLevel) {
+        advanceLevel();
+    }
+}
 
