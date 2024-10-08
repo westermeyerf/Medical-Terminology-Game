@@ -129,32 +129,49 @@ function displayOptions(containerId, options) {
 
 // Timer function
 function startTimer() {
-    let timeRemaining = 15;
-    document.getElementById("timer").innerText = timeRemaining;
+    let timeRemaining = 15; // Set the initial time for each term
+    document.getElementById("timer").innerText = timeRemaining; // Display the initial time
+    
+    // Start a countdown using setInterval
     timerInterval = setInterval(() => {
-        timeRemaining--;
+        timeRemaining--; // Decrement the timer each second
         document.getElementById("timer").innerText = timeRemaining;
-        if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            incorrectAnswers++;
-            document.getElementById("result").innerText = "Time's up!";
-            checkGameEnd();
+        
+        if (timeRemaining <= 0) { // When time runs out
+            clearInterval(timerInterval); // Stop the timer
+            incorrectAnswers++; // Increment the incorrect answer count
+            document.getElementById("result").innerText = "Time's up!"; // Display "Time's up!" message
+            
+            // Log the term result as incorrect due to timeout
+            currentTermReview.push({ term: terms[currentTermIndex].meaning, result: "Time ran out" });
+            
+            checkGameEnd(); // Check if game over or move to the next term
         }
-    }, 1000);
+    }, 1000); // Execute every 1000ms (1 second)
 }
 
 // Reset timer
 function resetTimer() {
-    clearInterval(timerInterval);
-    startTimer();
+    clearInterval(timerInterval); // Clear any existing timer
+    startTimer(); // Start a fresh timer for the next term
 }
 
-// Check for game end
+// Check for game end or proceed to the next term
 function checkGameEnd() {
-    if (incorrectAnswers >= 5) {
-        document.getElementById("result").innerText = "Game over!";
-        showReview();
+    if (incorrectAnswers >= 5) { // If player has 5 incorrect answers
+        document.getElementById("result").innerText = "Game over!"; // Show game over message
+        showReview(); // Show the end-of-level review
+    } else {
+        nextTerm(); // Otherwise, proceed to the next term
     }
+}
+
+// Move to the next term
+function nextTerm() {
+    resetTimer(); // Reset and start a new timer for the next term
+    currentTermIndex = (currentTermIndex + 1) % terms.length; // Move to the next term in the list
+    loadTerm(); // Load the new term's meaning for the player to match
+    generateOptions(); // Display new options for prefixes, roots, and suffixes
 }
 
 // Submit attempt
@@ -269,4 +286,3 @@ function drop(event, element) {
 window.onload = function() {
     initializeGame();
 };
-
