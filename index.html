@@ -37,6 +37,7 @@
             border: 2px dashed #aaa;
             width: 100px;
             min-height: 30px;
+            display: inline-block;
         }
         #progress-container {
             width: 100%;
@@ -70,6 +71,11 @@
         .column h4 {
             margin-bottom: 10px;
         }
+        .drop-zone-container {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -84,6 +90,8 @@
         <div id="progress-container">
             <div id="progress-bar"></div>
         </div>
+        
+        <!-- Drop Zones in Horizontal Row -->
         <div class="drop-zone-container">
             <div id="prefix-zone" class="drop-zone" ondrop="drop(event, this)" ondragover="allowDrop(event)">Prefix</div>
             <div id="root-zone" class="drop-zone" ondrop="drop(event, this)" ondragover="allowDrop(event)">Root</div>
