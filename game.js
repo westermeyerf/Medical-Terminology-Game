@@ -75,7 +75,7 @@ const totalTermsToWin = 70;
 
 let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
 
-// Shuffle terms
+// Shuffle function
 function shuffleTerms(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -83,14 +83,14 @@ function shuffleTerms(array) {
     }
 }
 
-// Initialize game
+// Initialize the game
 function initializeGame() {
     shuffleTerms(terms);
     loadTerm();
     generateOptions();
 }
 
-// Load the term meaning on the screen
+// Load the current term
 function loadTerm() {
     const currentTerm = terms[currentTermIndex];
     document.getElementById("term-meaning").innerText = currentTerm.meaning;
@@ -176,6 +176,7 @@ function submitAttempt() {
         incorrectSound.play();
         
         if (incorrectAnswers >= 5) {
+            updateLeaderboard();
             resetGame();
         }
     }
