@@ -129,49 +129,45 @@ function displayOptions(containerId, options) {
 
 // Timer function
 function startTimer() {
-    let timeRemaining = 15; // Set the initial time for each term
-    document.getElementById("timer").innerText = timeRemaining; // Display the initial time
+    let timeRemaining = 15;
+    document.getElementById("timer").innerText = timeRemaining;
     
-    // Start a countdown using setInterval
     timerInterval = setInterval(() => {
-        timeRemaining--; // Decrement the timer each second
+        timeRemaining--;
         document.getElementById("timer").innerText = timeRemaining;
         
-        if (timeRemaining <= 0) { // When time runs out
-            clearInterval(timerInterval); // Stop the timer
-            incorrectAnswers++; // Increment the incorrect answer count
-            document.getElementById("result").innerText = "Time's up!"; // Display "Time's up!" message
-            
-            // Log the term result as incorrect due to timeout
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            incorrectAnswers++;
+            document.getElementById("result").innerText = "Time's up!";
             currentTermReview.push({ term: terms[currentTermIndex].meaning, result: "Time ran out" });
-            
-            checkGameEnd(); // Check if game over or move to the next term
+            checkGameEnd();
         }
-    }, 1000); // Execute every 1000ms (1 second)
+    }, 1000);
 }
 
 // Reset timer
 function resetTimer() {
-    clearInterval(timerInterval); // Clear any existing timer
-    startTimer(); // Start a fresh timer for the next term
+    clearInterval(timerInterval);
+    startTimer();
 }
 
 // Check for game end or proceed to the next term
 function checkGameEnd() {
-    if (incorrectAnswers >= 5) { // If player has 5 incorrect answers
-        document.getElementById("result").innerText = "Game over!"; // Show game over message
-        showReview(true); // Show the review immediately and indicate game over
+    if (incorrectAnswers >= 5) {
+        document.getElementById("result").innerText = "Game over!";
+        showReview(true);
     } else {
-        nextTerm(); // Otherwise, proceed to the next term
+        nextTerm();
     }
 }
 
 // Move to the next term
 function nextTerm() {
-    resetTimer(); // Reset and start a new timer for the next term
-    currentTermIndex = (currentTermIndex + 1) % terms.length; // Move to the next term in the list
-    loadTerm(); // Load the new term's meaning for the player to match
-    generateOptions(); // Display new options for prefixes, roots, and suffixes
+    resetTimer();
+    currentTermIndex = (currentTermIndex + 1) % terms.length;
+    loadTerm();
+    generateOptions();
 }
 
 // Submit attempt
@@ -187,14 +183,14 @@ function submitAttempt() {
         correctAnswers++;
         score += 10;
         correctStreak++;
-        if (correctStreak % 3 === 0) score += 5; // Bonus points for streaks
+        if (correctStreak % 3 === 0) score += 5;
         document.getElementById("score").innerText = score;
         correctSound.play();
         currentTermReview.push({ term: currentTerm.meaning, result: "Correct" });
         updateProgressBar();
 
         if (correctAnswers % termsPerLevel === 0) {
-            showReview(false); // Show end-of-level review
+            showReview(false);
         } else {
             nextTerm();
         }
@@ -219,7 +215,7 @@ function updateProgressBar() {
 function useHint() {
     const currentTerm = terms[currentTermIndex];
     alert(`Hint: ${currentTerm.hint}`);
-    score = Math.max(0, score - 5); // Deduct points but don’t go below zero
+    score = Math.max(0, score - 5);
     document.getElementById("score").innerText = score;
 }
 
@@ -254,16 +250,23 @@ function nextLevel() {
 
 // Flashcard mode
 function startFlashcardMode() {
+    console.log("Entering Study Terms mode.");
     document.getElementById("flashcard-container").classList.remove("hidden");
     document.getElementById("game-container").classList.add("hidden");
     const flashcardList = document.getElementById("flashcard-list");
     flashcardList.innerHTML = "";
-    terms.forEach(term => {
-        const div = document.createElement("div");
-        div.className = "flashcard";
-        div.innerText = `Term: ${term.meaning}\nHint: ${term.hint}`;
-        flashcardList.appendChild(div);
-    });
+
+    if (terms.length > 0) {
+        terms.forEach(term => {
+            const div = document.createElement("div");
+            div.className = "flashcard";
+            div.innerText = `Term: ${term.meaning}\nHint: ${term.hint}`;
+            flashcardList.appendChild(div);
+        });
+    } else {
+        flashcardList.innerHTML = "<p>No terms available to study. Please check the terms list.</p>";
+        console.error("The terms array is empty. Please make sure it is populated with terms.");
+    }
 }
 
 // Exit flashcard mode
