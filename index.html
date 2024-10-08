@@ -44,57 +44,72 @@
             width: 100px;
             min-height: 30px;
         }
-        #leaderboard-container {
-            display: none;
-            margin-top: 20px;
+        #progress-container {
+            width: 100%;
+            background-color: #ddd;
+            margin: 10px 0;
+        }
+        #progress-bar {
+            height: 20px;
+            width: 0;
+            background-color: #4CAF50;
+        }
+        .flashcard, .review-item {
             background-color: #444;
             border-radius: 10px;
-            padding: 10px;
-            text-align: left;
+            padding: 5px;
+            margin: 5px 0;
         }
+        .hidden { display: none; }
+        .correct { color: #4CAF50; }
+        .incorrect { color: #FF6347; }
     </style>
 </head>
 <body>
     <div id="game-container">
         <h2>Medical Terminology Matching Game</h2>
         <label>Enter your name: <input type="text" id="playerName"></label>
+        <button onclick="startFlashcardMode()">Study Terms</button>
         <h3>Level: <span id="level">1</span></h3>
         <h3 id="instruction">Identify the medical term for:</h3>
         <div id="term-meaning">Loading...</div>
-
+        <p>Time Remaining: <span id="timer">15</span> seconds</p>
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
         <div class="drop-zone-container">
             <div id="prefix-zone" class="drop-zone" ondrop="drop(event, this)" ondragover="allowDrop(event)">Prefix</div>
             <div id="root-zone" class="drop-zone" ondrop="drop(event, this)" ondragover="allowDrop(event)">Root</div>
             <div id="suffix-zone" class="drop-zone" ondrop="drop(event, this)" ondragover="allowDrop(event)">Suffix</div>
         </div>
-
         <div class="options-container">
             <div id="prefix-options" class="options-list"></div>
             <div id="root-options" class="options-list"></div>
             <div id="suffix-options" class="options-list"></div>
         </div>
-
         <button onclick="submitAttempt()">Submit Answer</button>
+        <button onclick="useHint()">Hint (-5 points)</button>
         <p id="result">Result will be shown here</p>
         <p>Score: <span id="score">0</span></p>
-        <button id="resetBtn" onclick="resetGame()" style="display: none;">Restart Game</button>
-
         <audio id="correct-sound" preload="auto">
             <source src="correct.mp3" type="audio/mpeg">
-            <source src="correct.ogg" type="audio/ogg">
         </audio>
         <audio id="incorrect-sound" preload="auto">
             <source src="incorrect.mp3" type="audio/mpeg">
-            <source src="incorrect.ogg">
         </audio>
+        <div id="flashcard-container" class="hidden">
+            <h3>Flashcards</h3>
+            <div id="flashcard-list"></div>
+            <button onclick="exitFlashcardMode()">Back to Game</button>
+        </div>
+        <div id="review-container" class="hidden">
+            <h3>Level Summary</h3>
+            <div id="review-list"></div>
+            <button onclick="nextLevel()">Continue to Next Level</button>
+        </div>
     </div>
-    
-    <div id="leaderboard-container">
-        <h3>Leaderboard</h3>
-        <ul id="leaderboard"></ul>
-    </div>
-    
     <script src="game.js"></script>
 </body>
 </html>
+
 
