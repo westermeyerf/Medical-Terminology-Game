@@ -1,4 +1,4 @@
-
+// Medical terms list with 75 entries (provide full list)
 const terms = [
     { prefix: "hypo-", root: "glyc", suffix: "-emia", meaning: "Low blood sugar", hint: "Low sugar in the blood" },
     { prefix: "hyper-", root: "tens", suffix: "-ion", meaning: "High blood pressure", hint: "Elevated blood pressure" },
