@@ -1,13 +1,22 @@
+// Medical terms list with 75 entries (for brevity, only part of the array is shown here; make sure to include the full list)
 const terms = [
-    // The full terms array of 75 entries as provided
+    { prefix: "hypo-", root: "glyc", suffix: "-emia", meaning: "Low blood sugar", hint: "Low sugar in the blood" },
+    { prefix: "hyper-", root: "tens", suffix: "-ion", meaning: "High blood pressure", hint: "Elevated blood pressure" },
+    { prefix: "brady-", root: "card", suffix: "-ia", meaning: "Slow heart rate", hint: "Slowed heart rate" },
+    { prefix: "tachy-", root: "card", suffix: "-ia", meaning: "Fast heart rate", hint: "Fast heartbeat" },
+    { prefix: "dys-", root: "uria", suffix: "", meaning: "Painful urination", hint: "Difficult or painful urination" },
+    { prefix: "peri-", root: "card", suffix: "-itis", meaning: "Inflammation around the heart", hint: "Inflammation of the membrane around the heart" },
+    { prefix: "sub-", root: "derm", suffix: "-al", meaning: "Beneath the skin", hint: "Underneath the skin" },
+    { prefix: "ante-", root: "partum", suffix: "", meaning: "Before childbirth", hint: "Before labor" },
+    { prefix: "poly-", root: "neur", suffix: "-itis", meaning: "Inflammation of many nerves", hint: "Inflammation affecting multiple nerves" },
+    { prefix: "hemi-", root: "arthro", suffix: "-plasty", meaning: "Surgical repair of half a joint", hint: "Partial joint replacement surgery" },
+    // ... add the remaining terms to complete the list of 75
 ];
 
 let currentTermIndex = 0;
 let score = 0;
-let level = 1;
-const termsPerLevel = 15;
 
-// Shuffle function for randomizing terms
+// Shuffle the terms using Fisher-Yates algorithm
 function shuffleTerms(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -15,36 +24,36 @@ function shuffleTerms(array) {
     }
 }
 
-// Initialize the game and start with the first level
+// Initialize the game
 function initializeGame() {
-    shuffleTerms(terms);
+    shuffleTerms(terms); 
     loadTerm();
     generateOptions();
 }
 
-// Load the current term
+// Load the term meaning on the screen
 function loadTerm() {
     const currentTerm = terms[currentTermIndex];
     document.getElementById("term-meaning").innerText = currentTerm.meaning;
 }
 
-// Generate options for prefixes, roots, and suffixes
+// Generate and display the options for prefixes, roots, and suffixes
 function generateOptions() {
     const currentTerm = terms[currentTermIndex];
-    const prefixes = new Set(["hypo-", "hyper-", "brady-", "tachy-", "epi-"]);
-    const roots = new Set(["card", "glyc", "derm", "neur", "scop"]);
-    const suffixes = new Set(["itis", "-emia", "-ia", "-ion", "-ology"]);
+    const prefixes = ["hypo-", "hyper-", "brady-", "tachy-", "epi-"];
+    const roots = ["card", "glyc", "derm", "neur", "scop"];
+    const suffixes = ["itis", "-emia", "-ia", "-ion", "-ology"];
 
-    prefixes.add(currentTerm.prefix);
-    roots.add(currentTerm.root);
-    suffixes.add(currentTerm.suffix);
+    if (!prefixes.includes(currentTerm.prefix)) prefixes.push(currentTerm.prefix);
+    if (!roots.includes(currentTerm.root)) roots.push(currentTerm.root);
+    if (!suffixes.includes(currentTerm.suffix)) suffixes.push(currentTerm.suffix);
 
-    displayOptions("prefix-options", Array.from(prefixes));
-    displayOptions("root-options", Array.from(roots));
-    displayOptions("suffix-options", Array.from(suffixes));
+    displayOptions("prefix-options", prefixes);
+    displayOptions("root-options", roots);
+    displayOptions("suffix-options", suffixes);
 }
 
-// Display options on the game board
+// Display options in the container
 function displayOptions(containerId, options) {
     const container = document.getElementById(containerId);
     container.innerHTML = "";
@@ -60,7 +69,7 @@ function displayOptions(containerId, options) {
     });
 }
 
-// Drag-and-drop functions
+// Drag-and-drop functionality
 function drag(event) {
     event.dataTransfer.setData("text", event.target.innerText);
 }
@@ -75,7 +84,7 @@ function drop(event, element) {
     element.innerText = data;
 }
 
-// Submit the answer and provide feedback
+// Submit answer and give feedback
 function submitAttempt() {
     const currentTerm = terms[currentTermIndex];
     const prefixValue = document.getElementById("prefix-zone").innerText.trim();
@@ -87,41 +96,24 @@ function submitAttempt() {
 
     if (prefixValue === currentTerm.prefix && rootValue === currentTerm.root && suffixValue === currentTerm.suffix) {
         document.getElementById("result").innerText = "Correct!";
-        score += 1;
+        score += 10;
         document.getElementById("score").innerText = score;
         correctSound.play();
-        
-        if (score % termsPerLevel === 0) {
-            document.getElementById("nextLevelBtn").style.display = "block";
-        } else {
-            setTimeout(nextTerm, 1000); // Move to the next term if not on level-up
-        }
+        setTimeout(nextTerm, 1000);
     } else {
         document.getElementById("result").innerText = "Incorrect, try again.";
         incorrectSound.play();
     }
 }
 
-// Advance to the next term
+// Load the next term
 function nextTerm() {
     currentTermIndex = (currentTermIndex + 1) % terms.length;
     loadTerm();
     generateOptions();
 }
 
-// Advance to the next level
-function nextLevel() {
-    if (level < 5) {
-        level += 1;
-        document.getElementById("level").innerText = level;
-        document.getElementById("nextLevelBtn").style.display = "none";
-        nextTerm();
-    } else {
-        document.getElementById("result").innerText = "Congratulations! You’ve completed all levels!";
-    }
-}
-
-// Initialize the game when the window is loaded
+// Initialize the game on page load
 window.onload = function() {
     initializeGame();
 };

@@ -49,7 +49,6 @@
     <div id="game-container">
         <h2>Medical Terminology Matching Game</h2>
         <label>Enter your name: <input type="text" id="playerName"></label>
-        <h3>Level: <span id="level">1</span></h3>
         <h3 id="instruction">Identify the medical term for:</h3>
         <div id="term-meaning">Loading...</div>
 
@@ -68,7 +67,6 @@
         <button onclick="submitAttempt()">Submit Answer</button>
         <p id="result">Result will be shown here</p>
         <p>Score: <span id="score">0</span></p>
-        <button id="nextLevelBtn" onclick="nextLevel()" style="display: none;">Next Level</button>
 
         <audio id="correct-sound" preload="auto">
             <source src="correct.mp3" type="audio/mpeg">
