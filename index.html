@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical Terminology Matching Game</title>
     <style>
@@ -17,7 +16,7 @@
             margin: 0;
             flex-direction: column;
         }
-        #game-container {
+        .container {
             padding: 20px;
             border: 2px solid #4CAF50;
             border-radius: 10px;
@@ -25,11 +24,7 @@
             text-align: center;
             max-width: 600px;
         }
-        .options-container, .drop-zone-container {
-            margin: 10px 0;
-            display: flex;
-            justify-content: center;
-        }
+        .hidden { display: none; }
         .draggable {
             margin: 5px;
             padding: 5px;
@@ -54,22 +49,37 @@
             width: 0;
             background-color: #4CAF50;
         }
-        .flashcard, .review-item {
+        .flashcard {
             background-color: #444;
             border-radius: 10px;
             padding: 5px;
             margin: 5px 0;
         }
-        .hidden { display: none; }
-        .correct { color: #4CAF50; }
-        .incorrect { color: #FF6347; }
+        .button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
-    <div id="game-container">
+    <!-- Start Page -->
+    <div id="start-page" class="container">
+        <h1>Welcome to the Medical Terminology Matching Game!</h1>
+        <p>Match the prefixes, roots, and suffixes to correctly define medical terms. Aim to reach the final level without making too many mistakes!</p>
+        <button class="button" onclick="showGamePage()">Play Game</button>
+        <button class="button" onclick="showFlashcardPage()">Study Terms</button>
+    </div>
+
+    <!-- Game Page -->
+    <div id="game-page" class="container hidden">
         <h2>Medical Terminology Matching Game</h2>
         <label>Enter your name: <input type="text" id="playerName"></label>
-        <button onclick="startFlashcardMode()">Study Terms</button>
         <h3>Level: <span id="level">1</span></h3>
         <h3 id="instruction">Identify the medical term for:</h3>
         <div id="term-meaning">Loading...</div>
@@ -87,8 +97,8 @@
             <div id="root-options" class="options-list"></div>
             <div id="suffix-options" class="options-list"></div>
         </div>
-        <button onclick="submitAttempt()">Submit Answer</button>
-        <button onclick="useHint()">Hint (-5 points)</button>
+        <button class="button" onclick="submitAttempt()">Submit Answer</button>
+        <button class="button" onclick="useHint()">Hint (-5 points)</button>
         <p id="result">Result will be shown here</p>
         <p>Score: <span id="score">0</span></p>
         <audio id="correct-sound" preload="auto">
@@ -97,17 +107,15 @@
         <audio id="incorrect-sound" preload="auto">
             <source src="incorrect.mp3" type="audio/mpeg">
         </audio>
-        <div id="flashcard-container" class="hidden">
-            <h3>Flashcards</h3>
-            <div id="flashcard-list"></div>
-            <button onclick="exitFlashcardMode()">Back to Game</button>
-        </div>
-        <div id="review-container" class="hidden">
-            <h3>Level Summary</h3>
-            <div id="review-list"></div>
-            <button onclick="nextLevel()">Continue to Next Level</button>
-        </div>
     </div>
+
+    <!-- Flashcard Page -->
+    <div id="flashcard-page" class="container hidden">
+        <h2>Medical Terminology Flashcards</h2>
+        <div id="flashcard-list"></div>
+        <button class="button" onclick="showStartPage()">Back to Start</button>
+    </div>
+
     <script src="game.js"></script>
 </body>
 </html>

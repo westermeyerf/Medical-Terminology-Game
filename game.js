@@ -77,6 +77,43 @@ const termsPerLevel = 10;
 const totalTermsToWin = 70;
 let currentTermReview = [];
 
+// Show the Start Page
+function showStartPage() {
+    document.getElementById("start-page").classList.remove("hidden");
+    document.getElementById("game-page").classList.add("hidden");
+    document.getElementById("flashcard-page").classList.add("hidden");
+}
+
+// Show the Game Page
+function showGamePage() {
+    initializeGame();
+    document.getElementById("start-page").classList.add("hidden");
+    document.getElementById("game-page").classList.remove("hidden");
+    document.getElementById("flashcard-page").classList.add("hidden");
+}
+
+// Show the Flashcard Page
+function showFlashcardPage() {
+    document.getElementById("start-page").classList.add("hidden");
+    document.getElementById("game-page").classList.add("hidden");
+    document.getElementById("flashcard-page").classList.remove("hidden");
+    
+    const flashcardList = document.getElementById("flashcard-list");
+    flashcardList.innerHTML = ""; // Clear any existing content
+
+    if (terms.length > 0) {
+        terms.forEach(term => {
+            const div = document.createElement("div");
+            div.className = "flashcard";
+            div.innerText = `Term: ${term.meaning}\nHint: ${term.hint}`;
+            flashcardList.appendChild(div);
+        });
+    } else {
+        flashcardList.innerHTML = "<p>No terms available to study. Please check the terms list.</p>";
+        console.error("The terms array is empty. Please make sure it is populated with terms.");
+    }
+}
+
 // Initialize the game
 function initializeGame() {
     shuffleTerms(terms);
@@ -156,7 +193,7 @@ function resetTimer() {
 function checkGameEnd() {
     if (incorrectAnswers >= 5) {
         document.getElementById("result").innerText = "Game over!";
-        showReview(true);
+        showReview();
     } else {
         nextTerm();
     }
@@ -189,8 +226,8 @@ function submitAttempt() {
         currentTermReview.push({ term: currentTerm.meaning, result: "Correct" });
         updateProgressBar();
 
-        if (correctAnswers % termsPerLevel === 0) {
-            showReview(false);
+        if (correctAnswers >= totalTermsToWin) {
+            showReview();
         } else {
             nextTerm();
         }
@@ -219,60 +256,20 @@ function useHint() {
     document.getElementById("score").innerText = score;
 }
 
-// Review display
-function showReview(isGameOver) {
-    document.getElementById("review-container").classList.remove("hidden");
-    document.getElementById("game-container").classList.add("hidden");
-    const reviewList = document.getElementById("review-list");
-    reviewList.innerHTML = "";
+// Review display for game end
+function showReview() {
+    document.getElementById("game-page").classList.add("hidden");
+    const reviewList = document.createElement("div");
+    reviewList.innerHTML = "<h3>Game Over! Here are your results:</h3>";
+    
     currentTermReview.forEach(item => {
         const div = document.createElement("div");
         div.className = "review-item";
         div.innerText = `${item.term}: ${item.result}`;
         reviewList.appendChild(div);
     });
-    if (!isGameOver) {
-        document.getElementById("result").innerText = "Level Complete! Review your terms.";
-    } else {
-        document.getElementById("result").innerText = "Game Over! Review your terms.";
-    }
-}
 
-// Next level
-function nextLevel() {
-    level++;
-    document.getElementById("level").innerText = level;
-    currentTermReview = [];
-    document.getElementById("review-container").classList.add("hidden");
-    document.getElementById("game-container").classList.remove("hidden");
-    initializeGame();
-}
-
-// Flashcard mode
-function startFlashcardMode() {
-    console.log("Entering Study Terms mode.");
-    document.getElementById("flashcard-container").classList.remove("hidden");
-    document.getElementById("game-container").classList.add("hidden");
-    const flashcardList = document.getElementById("flashcard-list");
-    flashcardList.innerHTML = "";
-
-    if (terms.length > 0) {
-        terms.forEach(term => {
-            const div = document.createElement("div");
-            div.className = "flashcard";
-            div.innerText = `Term: ${term.meaning}\nHint: ${term.hint}`;
-            flashcardList.appendChild(div);
-        });
-    } else {
-        flashcardList.innerHTML = "<p>No terms available to study. Please check the terms list.</p>";
-        console.error("The terms array is empty. Please make sure it is populated with terms.");
-    }
-}
-
-// Exit flashcard mode
-function exitFlashcardMode() {
-    document.getElementById("flashcard-container").classList.add("hidden");
-    document.getElementById("game-container").classList.remove("hidden");
+    document.getElementById("start-page").appendChild(reviewList);
 }
 
 // Drag and drop functions
@@ -292,6 +289,6 @@ function drop(event, element) {
 
 // Initialize the game on page load
 window.onload = function() {
-    initializeGame();
+    showStartPage();
 };
 
